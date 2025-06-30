@@ -1,0 +1,16 @@
+{
+    "GoogleApi": {
+      "ProjectId": "invoicegenerator-463712",
+      "ClientEmail": "invoicegenerator@invoicegenerator-463712.iam.gserviceaccount.com",
+      "PrivateKey": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC7VXS9KIx4/XAO\ntvjBCYK9XYY8woQkovB+M5rab65Adgr0b781Eq9omFzWB7SmaAmPEtz7DzC6mxbI\nsqFoTMror00w8zhxyurj//BDcXmdpd5AN612Zt8ZaWfGcTVbGZUG0NkqlR/qKTyb\naQ8IzEd7gn3cR7Y/VFDgUaDnq2h/ZaITYAZihIRF2xwmZDWJRCvNhj0DcHBGP7+T\n5AI8C5EO22QSSDpu5L+prpaADvjvnVKVgEc5vqmR8XYjwcsYZGp+Cs1UkzNJhv11\nvs6F14qem/0o7sz0rzHTeH1JXkXsN/OyxplOYlegVuOdv+20A/1ZPtmFKVFOGSqb\nC4mWxZg/AgMBAAECggEAD7gzXDluKtY+yZ1Pm7Mr8K6hDbGCMSjTEWP3LI6Oiq4y\na8yCDkwLwrUg+nzEYJT+UwPRiJJVE8jhIo+KvRvPMwida5bH4mnqnUiOuroSQHOj\nW17QrszMZRopMR0IIyWEZywDQnAnsMMrvhwUvOJCD/p6i+TLRYknuDW2piSwrMU6\nNF6bC7bK7ft6bThg+//8+FDQQYj/ZsSYl06kVyzWllpxXezwpjwf9ZhO8OWd36q4\n82rNZ7AjDNOmCb90hWZwHf3XIEWcx8tWy0shQl13ocL+90UeMEJpJe+k4QSeQQth\ndD491A9CRSt459HZ4O/FAWQm7TmGRN5bgbH9ci/HwQKBgQDy8nnjwWHZsUqL7jLp\nw4t0UBXH+re4xcIO8KaEmXzVZm/keXpwkuv8QlxeD99nmloxlLIQh8lKszUSDID/\nJYCVR7PmTXDu3fOwECMveHH/dlAiwJwZKrLj8/j1jCC9uIkF226ropjPKeIcBSEy\nQ4Km1P+CJbYvMQtfbVnqoImOMQKBgQDFZhE07LX8cXI5WopyhCnSYeQgI8GElf9p\nQ4krD9XvrXYn+He0TEds9Ks7dFl1d37+88hfO905BpUH0ti6GG112woKho5vHqLq\nhiKYAASnxpJkB/1KbSKA8F/2MI4pUL+KRTfd7Dm0soTiAhHSDsOpE0K1jyi8tPeu\nEOrrNE7BbwKBgCVUaLI8RqLCgSfbI+uTZlwq6g3eUliL2nOdOpjpVKsdoFfE6rFd\ngfEy6Spy2er7ZpxzsqCjnKRjwOXTEgciZg2KBPSANbgeVpFZCW8D3NBaB5ovakzb\nqL0qAbkJHQbJ0hQaUXkB9OTwFJQlnaIxiWPFGrWOwd2idZLmJIjOvhQhAoGAQ+o9\n+UuHwXb2qazw/T1jdjKf3j7vEcLZwUmvI9Wq8W9ou4/M/4dO+7miQC5jqPqYAve0\n9K8QCdKt66crUbudzXKzHbP1xV1xB+dmd41qDJ9RNoFZMAYkXOBW48kI4EYb4GK4\nOe5QXE8fUPMNVowl3UH3Lag3h9VrccP4TzwL7JkCgYB5tQ+/1IC6f75upXwqaxdc\nc2V4FW3JXFi6HnlaGTKDuTYuvNytn25YO6OvXyrB+44A6Ug16xl7TBUWA5P0BgRg\nXDNa1yWRazIukDUF8tnZFZzRt28AhGCWhLE/mDXocxNalcdTQ/rmb2vDRilXQQux\nqJ3/UD6lU8AXCytikZVReA==\n-----END PRIVATE KEY-----\n",
+      "PrivateKeyId": "51dd02d2ab2bacdb365cbd06ad18d2dfb824f8e4",
+      "ClientId": "104844338029344649855",
+      "TokenUri": "https://oauth2.googleapis.com/token",
+      "Scopes": [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+      ],
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/invoicegenerator%40invoicegenerator-463712.iam.gserviceaccount.com",
+      "type": "service_account"
+    }
+  }

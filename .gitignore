@@ -68,8 +68,8 @@ _ReSharper*/
 *.DotSettings.user
 
 ## Docker
-**/docker-compose.override.yml
-**/docker-compose.*
+# **/docker-compose.override.yml
+# **/docker-compose.*
 **/Dockerfile.*
 
 ## Node-related (if using frontend)
@@ -78,5 +78,13 @@ npm-debug.log
 yarn-error.log
 dist/
 # appsettings.*.json
-*.appsettings.json
-!appsettings.json
+# *.appsettings.json
+# !appsettings.json
+
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.pdb
+*.env
