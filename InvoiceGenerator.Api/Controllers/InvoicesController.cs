@@ -1,6 +1,7 @@
 using InvoiceGenerator.Api.Models;
 using InvoiceGenerator.Api.Services;
 using InvoiceGenerator.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,7 +9,7 @@ using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Bcpg.Sig;
 
 namespace InvoiceGenerator.Api.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class InvoicesController : ControllerBase

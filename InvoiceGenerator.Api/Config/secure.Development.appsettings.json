@@ -12,5 +12,11 @@
       ],
       "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/invoicegenerator%40invoicegenerator-463712.iam.gserviceaccount.com",
       "type": "service_account"
-    }
+    },
+  "JwtSettings": {
+    "ExpiryMinutes": 60,
+    "Issuer": "InvoiceGenerator",
+    "Audience": "InvoiceUsers",
+    "SecretKey": "abcdefghijklmnopqrstuvwxyz1234567890"
   }
+}
