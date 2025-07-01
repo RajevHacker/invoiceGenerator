@@ -17,9 +17,14 @@ var env = builder.Environment;
 var key = Environment.GetEnvironmentVariable("CONFIG_KEY");
 
 // Decrypt JSON config first, then add it to Configuration before accessing any config values
-var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile($"secure.{env.EnvironmentName}.appsettings.json", key);
-var decryptedStream = new MemoryStream(Encoding.UTF8.GetBytes(decryptedJson));
+// var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile($"secure.{env.EnvironmentName}.appsettings.json", key);
 
+
+var basePath = AppContext.BaseDirectory; // or Directory.GetCurrentDirectory()
+var configFilePath = Path.Combine(basePath, "config", $"secure.{env.EnvironmentName}.appsettings.json");
+var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile(configFilePath, key);
+
+var decryptedStream = new MemoryStream(Encoding.UTF8.GetBytes(decryptedJson));
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
@@ -89,6 +94,7 @@ builder.Services.AddScoped<IInvoicePdfExporter, InvoicePdfExporter>();
 builder.Services.AddTransient<IGetInvoiceSummary, GetInvoiceSummaryService>();
 builder.Services.AddTransient<IInvoiceCancellationService, InvoiceCancellationService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddSingleton<IPartnerConfigurationResolver, PartnerConfigurationResolver>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();

@@ -11,16 +11,17 @@ namespace InvoiceGenerator.Api.Services;
 public class PaymentSheetService : IPaymentSheetService
 {
     private readonly SheetsService _sheetsService;
-    private readonly SheetSettings _sheetSettings;
+    private readonly IPartnerConfigurationResolver _partnerConfig;
 
-    public PaymentSheetService(GoogleServiceFactory factory, IOptions<SheetSettings> options, SheetsService sheetsService, IOptions<SheetSettings> sheetSettings)
+    public PaymentSheetService(GoogleServiceFactory factory,
+                                 SheetsService sheetsService, 
+                                 IPartnerConfigurationResolver partnerConfig)
     {
         _sheetsService = factory.CreateSheetsService();
-        _sheetSettings = options.Value;
-        // _sheetSettings = sheetSettings.Value;
+        _partnerConfig = partnerConfig;
     }
 
-    public async Task AppendPaymentAsync(PaymentEntry payment)
+    public async Task AppendPaymentAsync(string partnerName, PaymentEntry payment)
     {
         var values = new List<IList<object>>
         {
@@ -32,13 +33,14 @@ public class PaymentSheetService : IPaymentSheetService
                 payment.Amount
             }
         };
+        var _config = _partnerConfig.GetSettings(partnerName).SheetSettings;
 
-        string sheetName = _sheetSettings.Sheets["Payments"];
+        string sheetName = _config.Sheets["Payments"];
         string range = $"{sheetName}!A1:D1";
 
         var valueRange = new ValueRange { Values = values };
 
-        var appendRequest = _sheetsService.Spreadsheets.Values.Append(valueRange, _sheetSettings.SpreadsheetId, range);
+        var appendRequest = _sheetsService.Spreadsheets.Values.Append(valueRange, _config.SpreadsheetId, range);
         appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
         appendRequest.InsertDataOption = SpreadsheetsResource.ValuesResource.AppendRequest.InsertDataOptionEnum.INSERTROWS;
 

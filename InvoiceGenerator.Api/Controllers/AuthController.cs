@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest login)
     {
-        if (!await _userService.ValidateUserAsync(login.Username, login.Password))
+        if (!await _userService.ValidateUserAsync(login.partnerName, login.Username, login.Password))
             return Unauthorized("Invalid username or password");
 
         var tokenHandler = new JwtSecurityTokenHandler();
