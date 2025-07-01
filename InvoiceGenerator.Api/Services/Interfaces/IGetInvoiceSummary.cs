@@ -4,5 +4,5 @@ namespace InvoiceGenerator.Api.Services.Interfaces;
 
 public interface IGetInvoiceSummary
 {
-    public Task<BillHistoryEntry> GetInvoiceSummaryAsync();
+    public Task<BillHistoryEntry> GetInvoiceSummaryAsync(string partnerName);
 }

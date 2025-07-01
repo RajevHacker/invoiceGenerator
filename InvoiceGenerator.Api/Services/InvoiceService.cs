@@ -16,8 +16,15 @@ public class InvoiceService
      private readonly SheetSettings _sheetSettings;
      private readonly GoogleDriveSettings _googleDriveSettings;
 
-
-    public InvoiceService(IInvoiceSheetWriter invoiceSheetWriter, IInvoicePdfExporter pdfExporter, IGetInvoiceSummary getInvoiceSummary, IBillHistorySheetService billHistorySheetService, IInvoiceNumberGenerator invoiceNumber, IOptions<SheetSettings> sheetOptions, IOptions<GoogleDriveSettings> driveSettings)
+    private readonly IPartnerConfigurationResolver _partnerConfigurationResolver;
+    public InvoiceService(IInvoiceSheetWriter invoiceSheetWriter, 
+                            IInvoicePdfExporter pdfExporter, 
+                            IGetInvoiceSummary getInvoiceSummary, 
+                            IBillHistorySheetService billHistorySheetService, 
+                            IInvoiceNumberGenerator invoiceNumber, 
+                            IOptions<SheetSettings> sheetOptions, 
+                            IOptions<GoogleDriveSettings> driveSettings,
+                            IPartnerConfigurationResolver partnerConfig)
     {
         _sheetWriter = invoiceSheetWriter;
         _pdfExporter = pdfExporter;
@@ -26,23 +33,26 @@ public class InvoiceService
         _invoiceNumberGenerator = invoiceNumber;
         _sheetSettings = sheetOptions.Value;
         _googleDriveSettings = driveSettings.Value;
+        _partnerConfigurationResolver = partnerConfig;
     }
      
 
-    public async Task<InvoiceResponse> ProcessInvoiceAsync(InvoiceRequest request)
+    public async Task<InvoiceResponse> ProcessInvoiceAsync(string partnerName, InvoiceRequest request)
     {
-        var invoiceNumber = await _invoiceNumberGenerator.GenerateNextInvoiceNumberAsync();     
+        var _sheetConfig = _partnerConfigurationResolver.GetSettings(partnerName);
+        var invoiceNumber = await _invoiceNumberGenerator.GenerateNextInvoiceNumberAsync(partnerName);     
         request.invoiceNumber = invoiceNumber;
-        await _sheetWriter.WriteInvoiceToSheetAsync(request);
-        BillHistoryEntry summary =  await _getInvoiceSummary.GetInvoiceSummaryAsync();
-        _billHistorySheetService.AppendBillHistoryAsync(summary);
+        await _sheetWriter.WriteInvoiceToSheetAsync(partnerName, request);
+        BillHistoryEntry summary =  await _getInvoiceSummary.GetInvoiceSummaryAsync(partnerName);
+        _billHistorySheetService.AppendBillHistoryAsync(partnerName, summary);
         var InvoiceNumber = summary.InvoiceNumber;
-        string spreadsheetId = _sheetSettings.SpreadsheetId;
-        int gid = 0;         
+        string spreadsheetId = _sheetConfig.SheetSettings.SpreadsheetId;
+        int gid = 0; 
         string fileName = $"{InvoiceNumber}.pdf";    
-        string folderId = _googleDriveSettings.GeneratedInvoicesFolderId;
+        // string folderId = _googleDriveSettings.GeneratedInvoicesFolderId;
+        string folderId = _sheetConfig.GoogleDriveSettings.GeneratedInvoicesFolderId;
         var url = await _pdfExporter.ExportAndUploadInvoiceAsync(spreadsheetId, gid, fileName, folderId);
-        await _sheetWriter.ClearInvoiceFieldsAsync();
+        await _sheetWriter.ClearInvoiceFieldsAsync(partnerName);
 
         return new InvoiceResponse
         {

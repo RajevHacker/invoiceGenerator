@@ -4,5 +4,5 @@ namespace InvoiceGenerator.Api.Services.Interfaces;
 
 public interface IBillHistorySheetService
 {
-    Task AppendBillHistoryAsync(BillHistoryEntry entry);
+    Task AppendBillHistoryAsync(string partnerName, BillHistoryEntry entry);
 }

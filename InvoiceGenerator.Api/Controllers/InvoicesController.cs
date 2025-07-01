@@ -42,10 +42,18 @@ public class InvoicesController : ControllerBase
 
         return Ok("Payment added successfully.");
     }
-    [HttpPost("BillHistoryEntry")]
-    public async Task<IActionResult> AppendBillHistory([FromBody] BillHistoryEntry entry)
+
+    [HttpPost("InvoiceGenerator")]
+    public async Task<IActionResult> CreateInvoice([FromQuery] string partnerName, [FromBody] InvoiceRequest request)
     {
-        await _billHistorySheetService.AppendBillHistoryAsync(entry);
+        var InvoiceResponse = await _invoiceService.ProcessInvoiceAsync(partnerName, request);
+        return Ok(InvoiceResponse);
+    }
+
+    [HttpPost("BillHistoryEntry")]
+    public async Task<IActionResult> AppendBillHistory(string partnerName, [FromBody] BillHistoryEntry entry)
+    {
+        await _billHistorySheetService.AppendBillHistoryAsync(partnerName, entry);
         return Ok("Bill history entry added.");
     }
     [HttpPost("addCustomer")]
@@ -102,12 +110,12 @@ public class InvoicesController : ControllerBase
         await _productService.AddProductAsync(product);
         return Ok();
     }
-    [HttpPost("InvoiceGenerator")]
-    public async Task<IActionResult> CreateInvoice([FromBody] InvoiceRequest request)
-    {
-        var InvoiceResponse = await _invoiceService.ProcessInvoiceAsync(request);
-        return Ok(InvoiceResponse);
-    }
+    // [HttpPost("InvoiceGenerator")]
+    // public async Task<IActionResult> CreateInvoice([FromBody] InvoiceRequest request)
+    // {
+    //     var InvoiceResponse = await _invoiceService.ProcessInvoiceAsync(request);
+    //     return Ok(InvoiceResponse);
+    // }
     [HttpPost("cancel")]
     public async Task<IActionResult> CancelInvoice([FromQuery] string invoiceNumber)
     {

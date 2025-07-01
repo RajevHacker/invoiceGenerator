@@ -9,20 +9,26 @@ namespace InvoiceGenerator.Api.Services
     {
         private readonly IGoogleSheetsService _sheetsService;
         private readonly SheetSettings _settings;
-
+        private readonly IPartnerConfigurationResolver _partnerConfigurationResolver;
         private static readonly string FinancialYear = "25-26";
         private static readonly string Prefix = "KT";
 
-        public InvoiceNumberGenerator(IGoogleSheetsService sheetsService, IOptions<SheetSettings> options)
+        public InvoiceNumberGenerator(IGoogleSheetsService sheetsService, 
+                                        IOptions<SheetSettings> options,
+                                        IPartnerConfigurationResolver partnerConfigurationResolver)
         {
             _sheetsService = sheetsService;
             _settings = options.Value;
+            _partnerConfigurationResolver = partnerConfigurationResolver;
         }
 
-        public async Task<string> GenerateNextInvoiceNumberAsync()
+        public async Task<string> GenerateNextInvoiceNumberAsync(string partnerName)
         {
-            string sheetName = _settings.Sheets["BillHistory"];
-            string spreadsheetId = _settings.SpreadsheetId;
+            var _sheetConfig = _partnerConfigurationResolver.GetSettings(partnerName).SheetSettings;
+            // var _sheetIDConfig = _partnerConfigurationResolver.GetSettings(partnerName).SheetSettings.SpreadsheetId;
+            string sheetName = _sheetConfig.Sheets["BillHistory"];
+
+            string spreadsheetId = _sheetConfig.SpreadsheetId;
 
             // Column C contains invoice numbers
             string range = $"{sheetName}!C:C";

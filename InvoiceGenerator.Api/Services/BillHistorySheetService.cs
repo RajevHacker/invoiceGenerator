@@ -7,18 +7,19 @@ namespace InvoiceGenerator.Api.Services;
 public class BillHistorySheetService : IBillHistorySheetService
 {
     private readonly IGoogleSheetsService _googleSheetsService;
-    private readonly SheetSettings _sheetSettings;
+    private readonly IPartnerConfigurationResolver _partnerConfigurationResolver;
 
-    public BillHistorySheetService(IGoogleSheetsService googleSheetsService, IOptions<SheetSettings> options)
+    public BillHistorySheetService(IGoogleSheetsService googleSheetsService, IPartnerConfigurationResolver partnerConfigurationResolver)
     {
         _googleSheetsService = googleSheetsService;
-        _sheetSettings = options.Value;
+        _partnerConfigurationResolver = partnerConfigurationResolver;
     }
 
-    public async Task AppendBillHistoryAsync(BillHistoryEntry entry)
+    public async Task AppendBillHistoryAsync(string partnerName, BillHistoryEntry entry)
     {
-        var spreadsheetId = _sheetSettings.SpreadsheetId;
-        var sheetName = _sheetSettings.Sheets["BillHistory"];
+        var _sheetConfig = _partnerConfigurationResolver.GetSettings(partnerName).SheetSettings;
+        var spreadsheetId = _sheetConfig.SpreadsheetId;
+        var sheetName = _sheetConfig.Sheets["BillHistory"];
 
         // Step 1: Get current row count to determine the next row index
         int nextRow = await _googleSheetsService.GetNextRowIndexAsync(spreadsheetId, sheetName);

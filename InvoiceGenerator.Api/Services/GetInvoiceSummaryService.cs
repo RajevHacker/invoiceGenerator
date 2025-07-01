@@ -8,19 +8,23 @@ public class GetInvoiceSummaryService : IGetInvoiceSummary
 {
     private readonly IGoogleSheetsService _sheetsService;
     private readonly SheetSettings _settings;
+    private readonly IPartnerConfigurationResolver _partnerConfigurationResolver;
 
     public GetInvoiceSummaryService(
         IGoogleSheetsService sheetsService,
-        IOptions<SheetSettings> options)
+        IOptions<SheetSettings> options,
+        IPartnerConfigurationResolver partnerConfigurationResolver)
     {
         _sheetsService = sheetsService;
         _settings = options.Value;
+        _partnerConfigurationResolver = partnerConfigurationResolver;
     }
 
-    public async Task<BillHistoryEntry> GetInvoiceSummaryAsync()
+    public async Task<BillHistoryEntry> GetInvoiceSummaryAsync(string partnerName)
     {
-        string sheetName = _settings.Sheets["Invoice"];
-        string spreadsheetId = _settings.SpreadsheetId;
+        var _sheetConfig = _partnerConfigurationResolver.GetSettings(partnerName).SheetSettings;;
+        string sheetName = _sheetConfig.Sheets["Invoice"];
+        string spreadsheetId = _sheetConfig.SpreadsheetId;
 
         var cells = new List<string>
         {

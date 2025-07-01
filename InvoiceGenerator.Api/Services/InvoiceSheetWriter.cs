@@ -8,16 +8,20 @@ public class InvoiceSheetWriter : IInvoiceSheetWriter
 {
     private readonly IGoogleSheetsService _sheetsService;
     private readonly SheetSettings _settings;
+    private readonly IPartnerConfigurationResolver _partnerConfigurationResolver;
 
-    public InvoiceSheetWriter(IGoogleSheetsService sheetsService, IOptions<SheetSettings> options)
+    public InvoiceSheetWriter(IGoogleSheetsService sheetsService, IOptions<SheetSettings> options, IPartnerConfigurationResolver partnerConfigResolver)  
     {
         _sheetsService = sheetsService;
         _settings = options.Value;
+        _partnerConfigurationResolver = partnerConfigResolver;
     }
-    public async Task WriteInvoiceToSheetAsync(InvoiceRequest request)
+    public async Task WriteInvoiceToSheetAsync(string partnerName, InvoiceRequest request)
     {
-        string sheetName = _settings.Sheets["Invoice"];
-        string spreadsheetId = _settings.SpreadsheetId;
+        var _sheetConfig = _partnerConfigurationResolver.GetSettings(partnerName).SheetSettings;
+
+        string sheetName = _sheetConfig.Sheets["Invoice"];
+        string spreadsheetId = _sheetConfig.SpreadsheetId;
 
         var updates = new Dictionary<string, object>
         {
@@ -39,10 +43,11 @@ public class InvoiceSheetWriter : IInvoiceSheetWriter
         await _sheetsService.BatchUpdateAsync(spreadsheetId, updates);
     }
 
-    public async Task ClearInvoiceFieldsAsync()
+    public async Task ClearInvoiceFieldsAsync(string partnerName)
     {
-        string sheetName = _settings.Sheets["Invoice"];
-        string spreadsheetId = _settings.SpreadsheetId;
+        var _config = _partnerConfigurationResolver.GetSettings(partnerName);
+        string sheetName = _config.SheetSettings.Sheets["Invoice"];
+        string spreadsheetId =_config.SheetSettings.SpreadsheetId;
 
         var clears = new Dictionary<string, object>
         {

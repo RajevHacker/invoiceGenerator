@@ -4,6 +4,6 @@ namespace InvoiceGenerator.Api.Services.Interfaces;
 
 public interface IInvoiceSheetWriter
 {
-    Task WriteInvoiceToSheetAsync(InvoiceRequest request);
-    Task ClearInvoiceFieldsAsync();
+    Task WriteInvoiceToSheetAsync(string partnerName, InvoiceRequest request);
+    Task ClearInvoiceFieldsAsync(string partnerName);
 }
