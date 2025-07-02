@@ -30,6 +30,17 @@ builder.Configuration
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
     .AddJsonStream(decryptedStream);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 // Now bind JwtSettings after the decrypted config is loaded
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
@@ -100,7 +111,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-
+app.UseCors("AllowAll");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
