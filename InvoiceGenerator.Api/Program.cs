@@ -21,9 +21,11 @@ var key = Environment.GetEnvironmentVariable("CONFIG_KEY");
 
 
 var basePath = AppContext.BaseDirectory; // or Directory.GetCurrentDirectory()
-var configFilePath = Path.Combine(basePath, "config", $"secure.{env.EnvironmentName}.appsettings.json");
-var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile(configFilePath, key);
+var encryptedJson = Environment.GetEnvironmentVariable("ENCRYPTED_JSON_CONFIG");
+if (string.IsNullOrEmpty(encryptedJson))
+    throw new Exception("ENCRYPTED_JSON_CONFIG is not set.");
 
+var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile(encryptedJson, key); // Add this overload if needed
 var decryptedStream = new MemoryStream(Encoding.UTF8.GetBytes(decryptedJson));
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false)
@@ -121,3 +123,5 @@ app.MapControllers();
 app.Run();
 // CONFIG_KEY=your_secret_key ASPNETCORE_ENVIRONMENT=Development dotnet run
 // docker-compose up --build
+
+// ASPNETCORE_ENVIRONMENT=Development ENCRYPTED_JSON_CONFIG="Config/secure.Development.appsettings.json" CONFIG_KEY="your_secret_key" dotnet run

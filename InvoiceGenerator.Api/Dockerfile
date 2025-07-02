@@ -20,10 +20,11 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Copy the secure encrypted settings file into the container
-COPY Config/secure.Development.appsettings.json ./secure.Development.appsettings.json
+COPY Config/secure.Development.appsettings.json ./Config/secure.Development.appsettings.json
 
-# Set environment variables (override in docker-compose if needed)
+# Set environment variables (can be overridden by docker-compose)
 ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ENCRYPTED_JSON_CONFIG=/app/Config/secure.Development.appsettings.json
 
 # Expose default port
 EXPOSE 8080

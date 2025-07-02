@@ -6,7 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
-      CONFIG_KEY: your_decryption_key
-      ASPNETCORE_ENVIRONMENT: Development
+      CONFIG_KEY: your_decryption_key_here      # Replace with your real key
+      ASPNETCORE_ENVIRONMENT: Development       # Matches your config
+      ENCRYPTED_JSON_CONFIG: /app/Config/secure.Development.appsettings.json
