@@ -51,7 +51,7 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost("BillHistoryEntry")]
-    public async Task<IActionResult> AppendBillHistory(string partnerName, [FromBody] BillHistoryEntry entry)
+    public async Task<IActionResult> AppendBillHistory([FromQuery] string partnerName, [FromBody] BillHistoryEntry entry)
     {
         await _billHistorySheetService.AppendBillHistoryAsync(partnerName, entry);
         return Ok("Bill history entry added.");
