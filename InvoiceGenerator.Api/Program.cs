@@ -108,6 +108,7 @@ builder.Services.AddTransient<IGetInvoiceSummary, GetInvoiceSummaryService>();
 builder.Services.AddTransient<IInvoiceCancellationService, InvoiceCancellationService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddSingleton<IPartnerConfigurationResolver, PartnerConfigurationResolver>();
+builder.Services.AddTransient<ISearchValueService, searchValueService>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();

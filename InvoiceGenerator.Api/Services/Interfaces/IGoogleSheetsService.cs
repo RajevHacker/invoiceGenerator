@@ -9,4 +9,5 @@ public interface IGoogleSheetsService
     Task<IList<IList<object>>> GetSheetValuesAsync(string spreadsheetId, string range);
     Task UpdateCellAsync(string spreadsheetId, string cell, object value);
     Task BatchUpdateAsync(string spreadsheetId, Dictionary<string, object> updates);
+    Task<List<string>> GetColumnValuesAsync(string spreadsheetId, string sheetName, string columnLetter);
 }

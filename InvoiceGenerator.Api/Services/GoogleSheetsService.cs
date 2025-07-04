@@ -93,4 +93,17 @@ public class GoogleSheetsService : IGoogleSheetsService
         var request = _sheetsService.Spreadsheets.Values.BatchUpdate(requestBody, spreadsheetId);
         await request.ExecuteAsync();
     }
+    public async Task<List<string>> GetColumnValuesAsync(string spreadsheetId, string sheetName, string columnLetter)
+    {
+        string range = $"{sheetName}!{columnLetter}:{columnLetter}";
+        var request = _sheetsService.Spreadsheets.Values.Get(spreadsheetId, range);
+        var response = await request.ExecuteAsync();
+
+        var values = response.Values?
+            .Select(row => row.FirstOrDefault()?.ToString())
+            .Where(val => !string.IsNullOrWhiteSpace(val))
+            .ToList();
+
+        return values ?? new List<string>();
+    }
 }

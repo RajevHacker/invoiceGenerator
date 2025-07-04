@@ -22,8 +22,8 @@ public class InvoicesController : ControllerBase
     private readonly IInvoicePdfExporter _pdfExporter;
     private readonly ILogger<InvoicesController> _logger;
     private readonly IInvoiceCancellationService _invoiceCancellationService;
-
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, IInvoicePdfExporter pdfExporter, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation) 
+    private readonly ISearchValueService _searchValueService;
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, IInvoicePdfExporter pdfExporter, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -33,6 +33,7 @@ public class InvoicesController : ControllerBase
         _pdfExporter = pdfExporter;
         _logger = logger;
         _invoiceCancellationService = invoiceCancellation;
+        _searchValueService = searchValueService;
     }
 
     [HttpPost("PaymentEntry")]
@@ -122,5 +123,12 @@ public class InvoicesController : ControllerBase
         var result = await _invoiceCancellationService.CancelInvoiceAsync(invoiceNumber);
         if (!result) return NotFound("Invoice not found or already cancelled.");
         return Ok("Invoice cancelled successfully.");
+    }
+    [HttpGet("SearchCustomers")]
+    public async Task<IActionResult> SearchCustomers([FromQuery] string partnerName, [FromQuery] string sheetName,
+        [FromQuery] string searchValue)
+    {
+        var result = await _searchValueService.SearchValueAsync(partnerName, sheetName, searchValue);
+        return Ok(result);
     }
 }
