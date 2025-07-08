@@ -8,38 +8,40 @@ namespace InvoiceGenerator.Api.Services
     {
         private readonly IDriveUploader _driveService;
         private readonly IGoogleSheetsService _sheetsService;
-        private readonly GoogleDriveSettings _driveSettings;
-        private readonly SheetSettings _sheetSettings;
+        private readonly IPartnerConfigurationResolver _partnerConfigurationResolver;
 
         public InvoiceCancellationService(
             IDriveUploader driveService,
             IGoogleSheetsService sheetsService,
             IOptions<GoogleDriveSettings> driveOptions,
-            IOptions<SheetSettings> sheetOptions)
+            IOptions<SheetSettings> sheetOptions,
+            IPartnerConfigurationResolver partnerConfigResolver)
         {
             _driveService = driveService;
-            _sheetsService = sheetsService;
-            _driveSettings = driveOptions.Value;
-            _sheetSettings = sheetOptions.Value;
+            _sheetsService = sheetsService; 
+            _partnerConfigurationResolver = partnerConfigResolver;
         }
 
-        public async Task<bool> CancelInvoiceAsync(string invoiceNumber)
+        public async Task<bool> CancelInvoiceAsync(string invoiceNumber, string partnerName)
         {
             // Step 1: Find the file in Google Drive
-            var files = await _driveService.ListFilesInFolderAsync(_driveSettings.GeneratedInvoicesFolderId);
+            var _driveConfig = _partnerConfigurationResolver.GetSettings(partnerName).GoogleDriveSettings;
+            var _sheetConfig = _partnerConfigurationResolver.GetSettings(partnerName).SheetSettings;
+            var files = await _driveService.ListFilesInFolderAsync(_driveConfig.GeneratedInvoicesFolderId);
             var file = files.FirstOrDefault(f => f.Name.Contains(invoiceNumber, StringComparison.OrdinalIgnoreCase));
 
             if (file == null)
                 return false; // File not found
 
             // Step 2: Move it to "Cancelled Invoices" folder
-            await _driveService.MoveFileAsync(file.Id, _driveSettings.GeneratedInvoicesFolderId, _driveSettings.CancelledInvoicesFolderId);
+            await _driveService.MoveFileAsync(file.Id, _driveConfig.GeneratedInvoicesFolderId, _driveConfig.CancelledInvoicesFolderId);
 
             // Step 3: Find the row of invoiceNumber in BillHistory sheet (Invoice # in column C)
-            string sheetName = _sheetSettings.Sheets["BillHistory"];
+            
+            string sheetName = _sheetConfig.Sheets["BillHistory"];
             string invoiceRange = $"{sheetName}!C:C"; // Invoice numbers in column C
 
-            var rows = await _sheetsService.GetSheetValuesAsync(_sheetSettings.SpreadsheetId, invoiceRange);
+            var rows = await _sheetsService.GetSheetValuesAsync(_sheetConfig.SpreadsheetId, invoiceRange);
 
             for (int i = 0; i < rows.Count; i++)
             {
@@ -63,12 +65,11 @@ namespace InvoiceGenerator.Api.Services
 
                     // You can decide what values to keep or clear. Here, I clear all except InvoiceNumber and set CustomerName as "Cancelled".
 
-                    await _sheetsService.BatchUpdateAsync(_sheetSettings.SpreadsheetId, updates);
+                    await _sheetsService.BatchUpdateAsync(_sheetConfig.SpreadsheetId, updates);
 
                     return true;
                 }
             }
-
             return false;
         }
     }

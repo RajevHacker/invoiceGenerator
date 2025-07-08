@@ -23,7 +23,8 @@ public class InvoicesController : ControllerBase
     private readonly ILogger<InvoicesController> _logger;
     private readonly IInvoiceCancellationService _invoiceCancellationService;
     private readonly ISearchValueService _searchValueService;
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, IInvoicePdfExporter pdfExporter, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService) 
+    private readonly IGetBillHistortyInfo _getInvoiceDetail;
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, IInvoicePdfExporter pdfExporter, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -34,6 +35,7 @@ public class InvoicesController : ControllerBase
         _logger = logger;
         _invoiceCancellationService = invoiceCancellation;
         _searchValueService = searchValueService;
+        _getInvoiceDetail = getBillHistoryInfo;
     }
 
     [HttpPost("PaymentEntry")]
@@ -111,16 +113,16 @@ public class InvoicesController : ControllerBase
         await _productService.AddProductAsync(product);
         return Ok();
     }
-    // [HttpPost("InvoiceGenerator")]
-    // public async Task<IActionResult> CreateInvoice([FromBody] InvoiceRequest request)
-    // {
-    //     var InvoiceResponse = await _invoiceService.ProcessInvoiceAsync(request);
-    //     return Ok(InvoiceResponse);
-    // }
-    [HttpPost("cancel")]
-    public async Task<IActionResult> CancelInvoice([FromQuery] string invoiceNumber)
+    [HttpGet("getCancelInvoiceDetails")]
+    public async Task<IActionResult> getCancelInvoiceDetails([FromQuery] string invoiceNumber, [FromQuery] string partnerName)
     {
-        var result = await _invoiceCancellationService.CancelInvoiceAsync(invoiceNumber);
+        var a = await _getInvoiceDetail.GetBillHistoryInfo(invoiceNumber,partnerName);
+        return Ok(a);
+    }
+    [HttpPost("cancel")]
+    public async Task<IActionResult> CancelInvoice([FromQuery] string invoiceNumber, [FromQuery] string partnerName)
+    {
+        var result = await _invoiceCancellationService.CancelInvoiceAsync(invoiceNumber, partnerName);
         if (!result) return NotFound("Invoice not found or already cancelled.");
         return Ok("Invoice cancelled successfully.");
     }
