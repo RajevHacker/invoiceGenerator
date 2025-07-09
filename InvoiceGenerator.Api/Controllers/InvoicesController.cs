@@ -19,19 +19,17 @@ public class InvoicesController : ControllerBase
     private readonly ICustomerInfoService _customerService;
     private readonly IProductService _productService;
     private readonly InvoiceService _invoiceService;
-    private readonly IInvoicePdfExporter _pdfExporter;
     private readonly ILogger<InvoicesController> _logger;
     private readonly IInvoiceCancellationService _invoiceCancellationService;
     private readonly ISearchValueService _searchValueService;
     private readonly IGetBillHistortyInfo _getInvoiceDetail;
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, IInvoicePdfExporter pdfExporter, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo) 
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
         _customerService = customerService;
         _productService = productService;
         _invoiceService = invoiceService;
-        _pdfExporter = pdfExporter;
         _logger = logger;
         _invoiceCancellationService = invoiceCancellation;
         _searchValueService = searchValueService;
