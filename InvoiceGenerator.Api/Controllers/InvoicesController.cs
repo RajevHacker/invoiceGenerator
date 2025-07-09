@@ -105,12 +105,12 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost("addProduct")]
-    public async Task<IActionResult> Add([FromBody] Product product)
+    public async Task<IActionResult> Add([FromBody] Product product, [FromQuery] string partnerName)
     {
         if (string.IsNullOrWhiteSpace(product.Name))
             return BadRequest("Product name is required");
 
-        await _productService.AddProductAsync(product);
+        await _productService.AddProductAsync(product, partnerName);
         return Ok();
     }
     [HttpGet("getCancelInvoiceDetails")]

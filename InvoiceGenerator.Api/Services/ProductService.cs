@@ -8,11 +8,13 @@ public class ProductService : IProductService
 {
     private readonly IGoogleSheetsService _googleSheetsService;
     private readonly SheetSettings _sheetSettings;
+    private readonly IPartnerConfigurationResolver _partnerConfig;
 
-    public ProductService(IGoogleSheetsService googleSheetsService, IOptions<SheetSettings> options)
+    public ProductService(IGoogleSheetsService googleSheetsService, IOptions<SheetSettings> options, IPartnerConfigurationResolver partnerConfig)
     {
         _googleSheetsService = googleSheetsService;
         _sheetSettings = options.Value;
+        _partnerConfig = partnerConfig;
     }
 
     public async Task<IList<Product>> GetAllProductsAsync()
@@ -30,10 +32,11 @@ public class ProductService : IProductService
             ?? new List<Product>();
     }
 
-    public async Task AddProductAsync(Product product)
+    public async Task AddProductAsync(Product product, string partnerName)
     {
-        var spreadsheetId = _sheetSettings.SpreadsheetId;
-        var sheetName = _sheetSettings.Sheets["Products"];
+        var _SheetConfig = _partnerConfig.GetSettings(partnerName).SheetSettings;
+        var spreadsheetId = _SheetConfig.SpreadsheetId;
+        var sheetName = _SheetConfig.Sheets["Products"];
         var range = $"{sheetName}!A1";
 
         var row = new List<object> { product.Name ?? "" };
