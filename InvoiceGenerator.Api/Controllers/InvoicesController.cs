@@ -60,9 +60,9 @@ public class InvoicesController : ControllerBase
         return Ok("Bill history entry added.");
     }
     [HttpPost("addCustomer")]
-    public async Task<IActionResult> AddCustomer([FromBody] CustomerInfo customer)
+    public async Task<IActionResult> AddCustomer([FromBody] CustomerInfo customer, [FromQuery] string partnerName)
     {
-        await _customerService.AddCustomerAsync(customer);
+        await _customerService.AddCustomerAsync(customer, partnerName);
         return Ok();
     }
 

@@ -20,10 +20,11 @@ public class CustomerInfoService : ICustomerInfoService
         _partnerConfigResolver = partnerConfig;
     }
 
-    public async Task AddCustomerAsync(CustomerInfo customer)
+    public async Task AddCustomerAsync(CustomerInfo customer, string partnerName)
     {
-        var spreadsheetId = _sheetSettings.SpreadsheetId;
-        var sheetName = _sheetSettings.Sheets["CustomerDetails"];
+        var _sheetSetting = _partnerConfigResolver.GetSettings(partnerName).SheetSettings;
+        var spreadsheetId = _sheetSetting.SpreadsheetId;
+        var sheetName = _sheetSetting.Sheets["CustomerDetails"];
         var range = $"{sheetName}!A1:G1";
 
         var row = new List<object>
