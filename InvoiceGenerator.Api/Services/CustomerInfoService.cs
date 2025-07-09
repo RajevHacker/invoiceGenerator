@@ -11,11 +11,13 @@ public class CustomerInfoService : ICustomerInfoService
 {
     private readonly IGoogleSheetsService _googleSheetsService;
     private readonly SheetSettings _sheetSettings;
+    private readonly IPartnerConfigurationResolver _partnerConfigResolver;
 
-    public CustomerInfoService(IGoogleSheetsService googleSheetsService, IOptions<SheetSettings> options)
+    public CustomerInfoService(IGoogleSheetsService googleSheetsService, IOptions<SheetSettings> options, IPartnerConfigurationResolver partnerConfig)
     {
         _googleSheetsService = googleSheetsService;
         _sheetSettings = options.Value;
+        _partnerConfigResolver = partnerConfig;
     }
 
     public async Task AddCustomerAsync(CustomerInfo customer)
@@ -38,10 +40,12 @@ public class CustomerInfoService : ICustomerInfoService
         await _googleSheetsService.AppendRowAsync(spreadsheetId, range, row);
     }
 
-    public async Task<IList<CustomerInfo>> GetAllCustomersAsync()
+    public async Task<IList<CustomerInfo>> GetAllCustomersAsync(string partnerName)
     {
-        var spreadsheetId = _sheetSettings.SpreadsheetId;
-        var sheetName = _sheetSettings.Sheets["CustomerDetails"];
+        var _sheetSetting = _partnerConfigResolver.GetSettings(partnerName).SheetSettings;
+
+        var spreadsheetId = _sheetSetting.SpreadsheetId;
+        var sheetName = _sheetSetting.Sheets["CustomerDetails"];
         var range = $"{sheetName}!A2:G";
 
         var values = await _googleSheetsService.GetSheetValuesAsync(spreadsheetId, range);
@@ -66,11 +70,12 @@ public class CustomerInfoService : ICustomerInfoService
         return customers;
     }
 
-    public async Task<CustomerInfo?> GetCustomerByNameAsync(string name)
+    public async Task<CustomerInfo?> GetCustomerByNameAsync(string name, string partnerName)
     {
-        var customers = await GetAllCustomersAsync();
-        return customers.FirstOrDefault(c => 
-                                string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        var customers = await GetAllCustomersAsync(partnerName);        
+        var customer = customers.FirstOrDefault(c => 
+            string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        return customer;
     }
 
     public async Task UpdateCustomerByNameAsync(string name, CustomerInfo updated)

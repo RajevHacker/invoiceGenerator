@@ -66,16 +66,16 @@ public class InvoicesController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("getAllCustomer")]
-    public async Task<ActionResult<IList<CustomerInfo>>> GetAllCustomers()
-    {
-        return Ok(await _customerService.GetAllCustomersAsync());
-    }
+    // [HttpGet("getAllCustomer")]
+    // public async Task<ActionResult<IList<CustomerInfo>>> GetAllCustomers()
+    // {
+    //     return Ok(await _customerService.GetAllCustomersAsync());
+    // }
 
-    [HttpGet("getCustomerByName/{name}")]
-    public async Task<ActionResult<CustomerInfo>> GetCustomerByGst(string name)
+    [HttpGet("getCustomerByName")]
+    public async Task<ActionResult<CustomerInfo>> GetCustomerByCusName([FromQuery] string customerName,[FromQuery] string partnerName)
     {
-        var customer = await _customerService.GetCustomerByNameAsync(name);
+        var customer = await _customerService.GetCustomerByNameAsync(customerName, partnerName);
         if (customer == null)
         {
             return Ok("Customer not found");
