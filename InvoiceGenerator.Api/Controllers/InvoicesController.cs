@@ -84,10 +84,10 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPut("updateCustomerDetail")]
-    public async Task<IActionResult> UpdateCustomer([FromBody] CustomerInfo updatedCustomerData)
+    public async Task<IActionResult> UpdateCustomer([FromBody] CustomerInfo updatedCustomerData, [FromQuery] string partnerName)
     {
         string name = updatedCustomerData.Name;
-        await _customerService.UpdateCustomerByNameAsync(name, updatedCustomerData);
+        await _customerService.UpdateCustomerByNameAsync(name, updatedCustomerData, partnerName);
         return Ok();
     }
 

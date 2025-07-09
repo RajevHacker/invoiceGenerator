@@ -78,10 +78,11 @@ public class CustomerInfoService : ICustomerInfoService
         return customer;
     }
 
-    public async Task UpdateCustomerByNameAsync(string name, CustomerInfo updated)
+    public async Task UpdateCustomerByNameAsync(string name, CustomerInfo updated, string partnerName)
     {
-        var spreadsheetId = _sheetSettings.SpreadsheetId;
-        var sheetName = _sheetSettings.Sheets["CustomerDetails"];
+        var _sheetSetting = _partnerConfigResolver.GetSettings(partnerName).SheetSettings;
+        var spreadsheetId = _sheetSetting.SpreadsheetId;
+        var sheetName = _sheetSetting.Sheets["CustomerDetails"];
         var range = $"{sheetName}!A2:G";
 
         var values = await _googleSheetsService.GetSheetValuesAsync(spreadsheetId, range);
