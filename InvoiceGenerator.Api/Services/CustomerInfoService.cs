@@ -26,6 +26,8 @@ public class CustomerInfoService : ICustomerInfoService
         var spreadsheetId = _sheetSetting.SpreadsheetId;
         var sheetName = _sheetSetting.Sheets["CustomerDetails"];
         var range = $"{sheetName}!A1:G1";
+        int nextRowIndex = await _googleSheetsService.GetNextRowIndexAsync(spreadsheetId, sheetName);
+        var cusFormula = $"=SUMIF(BillHistory!A:A,A{nextRowIndex},BillHistory!O:O)";
 
         var row = new List<object>
         {
@@ -35,7 +37,8 @@ public class CustomerInfoService : ICustomerInfoService
             customer.State ?? "",
             customer.StateCode ?? "",
             customer.GSTNo ?? "",
-            customer.Email ?? ""
+            customer.Email ?? "",
+            cusFormula
         };
 
         await _googleSheetsService.AppendRowAsync(spreadsheetId, range, row);

@@ -9,4 +9,5 @@ public class CustomerInfo
     public string StateCode { get; set; }
     public string GSTNo { get; set; }
     public string Email { get; set; }
+    public string? custFormula { get; set; }
 }
