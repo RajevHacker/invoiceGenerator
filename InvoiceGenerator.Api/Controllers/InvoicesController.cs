@@ -40,9 +40,9 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost("PaymentEntry")]
-    public async Task<IActionResult> AddPayment([FromQuery] string partnerName, [FromBody] PaymentEntry payment)
+    public async Task<IActionResult> AddPayment([FromQuery] string partnerName, [FromBody] PaymentEntry payment, [FromQuery] string paymentType)
     {
-        await _paymentSheetService.AppendPaymentAsync(partnerName, payment);
+        await _paymentSheetService.AppendPaymentAsync(partnerName, payment, paymentType);
 
         return Ok("Payment added successfully.");
     }

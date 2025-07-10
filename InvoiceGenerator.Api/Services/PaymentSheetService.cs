@@ -21,7 +21,7 @@ public class PaymentSheetService : IPaymentSheetService
         _partnerConfig = partnerConfig;
     }
 
-    public async Task AppendPaymentAsync(string partnerName, PaymentEntry payment)
+    public async Task AppendPaymentAsync(string partnerName, PaymentEntry payment, string paymentType)
     {
         var values = new List<IList<object>>
         {
@@ -34,8 +34,7 @@ public class PaymentSheetService : IPaymentSheetService
             }
         };
         var _config = _partnerConfig.GetSettings(partnerName).SheetSettings;
-
-        string sheetName = _config.Sheets["Payments"];
+        string sheetName = paymentType == "Payments" ? _config.Sheets["Payments"] : _config.Sheets["PurchasePayment"];
         string range = $"{sheetName}!A1:D1";
 
         var valueRange = new ValueRange { Values = values };
