@@ -1,4 +1,5 @@
 using InvoiceGenerator.Api.Models;
+using InvoiceGenerator.Api.Models.InvoiceSummary;
 using InvoiceGenerator.Api.Services;
 using InvoiceGenerator.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +24,8 @@ public class InvoicesController : ControllerBase
     private readonly IInvoiceCancellationService _invoiceCancellationService;
     private readonly ISearchValueService _searchValueService;
     private readonly IGetBillHistortyInfo _getInvoiceDetail;
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo) 
+    private readonly IpurchaseOrderEntryService _purchaseOrderEntry;
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -34,6 +36,7 @@ public class InvoicesController : ControllerBase
         _invoiceCancellationService = invoiceCancellation;
         _searchValueService = searchValueService;
         _getInvoiceDetail = getBillHistoryInfo;
+        _purchaseOrderEntry = purchaseOrder;
     }
 
     [HttpPost("PaymentEntry")]
@@ -95,12 +98,12 @@ public class InvoicesController : ControllerBase
         await _customerService.DeleteCustomerAsync(gstNo);
         return Ok();
     }
-    [HttpGet("getAllProducts")]
-    public async Task<IActionResult> GetAll()
-    {
-        var products = await _productService.GetAllProductsAsync();
-        return Ok(products);
-    }
+    // [HttpGet("getAllProducts")]
+    // public async Task<IActionResult> GetAll()
+    // {
+    //     var products = await _productService.GetAllProductsAsync();
+    //     return Ok(products);
+    // }
 
     [HttpPost("addProduct")]
     public async Task<IActionResult> Add([FromBody] Product product, [FromQuery] string partnerName)
@@ -111,6 +114,7 @@ public class InvoicesController : ControllerBase
         await _productService.AddProductAsync(product, partnerName);
         return Ok();
     }
+    // To see in the UI what Invoice is going to get cancelled
     [HttpGet("getCancelInvoiceDetails")]
     public async Task<IActionResult> getCancelInvoiceDetails([FromQuery] string invoiceNumber, [FromQuery] string partnerName)
     {
@@ -131,4 +135,11 @@ public class InvoicesController : ControllerBase
         var result = await _searchValueService.SearchValueAsync(partnerName, sheetName, searchValue);
         return Ok(result);
     }
+    [HttpPost("AddPurchaseOrder")]
+    public async Task<IActionResult> addPurchaseOrder([FromQuery] string partnerName, [FromBody] purchaseOrderEntry entry)
+    {
+        await _purchaseOrderEntry.AppendPurchaseOrderAsync(partnerName, entry);
+        return Ok("Added Purchase Order.");
+    }
+
 }
