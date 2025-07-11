@@ -25,7 +25,8 @@ public class InvoicesController : ControllerBase
     private readonly ISearchValueService _searchValueService;
     private readonly IGetBillHistortyInfo _getInvoiceDetail;
     private readonly IpurchaseOrderEntryService _purchaseOrderEntry;
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder) 
+    private readonly IAddPurchaseConsumerRecord _addPurchaseConsumerRecord;
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -37,6 +38,7 @@ public class InvoicesController : ControllerBase
         _searchValueService = searchValueService;
         _getInvoiceDetail = getBillHistoryInfo;
         _purchaseOrderEntry = purchaseOrder;
+        _addPurchaseConsumerRecord =  addPurchaseConsumerRecord;
     }
 
     [HttpPost("PaymentEntry")]
@@ -140,6 +142,12 @@ public class InvoicesController : ControllerBase
     {
         await _purchaseOrderEntry.AppendPurchaseOrderAsync(partnerName, entry);
         return Ok("Added Purchase Order.");
+    }
+    [HttpPost("AddPurchaseConsumer")]
+    public async Task<IActionResult> addPurchaseConsumer([FromQuery] string partnerName, [FromBody] purchaseOrderConsumer consumerDetail)
+    {
+        await _addPurchaseConsumerRecord.AppendPurchaseOrderAsync(partnerName, consumerDetail);
+        return Ok("Consumer Added");
     }
 
 }

@@ -111,6 +111,7 @@ builder.Services.AddSingleton<IPartnerConfigurationResolver, PartnerConfiguratio
 builder.Services.AddTransient<ISearchValueService, searchValueService>();
 builder.Services.AddTransient<IGetBillHistortyInfo, GetBillHistortyInfoService>();
 builder.Services.AddTransient<IpurchaseOrderEntryService, purchaseOrderEntryService>();
+builder.Services.AddTransient<IAddPurchaseConsumerRecord, addPurchaseConsumerRecord>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
