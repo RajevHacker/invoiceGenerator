@@ -139,15 +139,21 @@ public class InvoicesController : ControllerBase
     }
     [HttpPost("AddPurchaseOrder")]
     public async Task<IActionResult> addPurchaseOrder([FromQuery] string partnerName, [FromBody] purchaseOrderEntry entry)
-    {
+    {        
         await _purchaseOrderEntry.AppendPurchaseOrderAsync(partnerName, entry);
         return Ok("Added Purchase Order.");
     }
     [HttpPost("AddPurchaseConsumer")]
     public async Task<IActionResult> addPurchaseConsumer([FromQuery] string partnerName, [FromBody] purchaseOrderConsumer consumerDetail)
-    {
+    {           
         await _addPurchaseConsumerRecord.AppendPurchaseOrderAsync(partnerName, consumerDetail);
         return Ok("Consumer Added");
+    }
+    [HttpGet()]
+    public async Task<ActionResult<IList<CustomerInfo>>> getPendingPurchasePaymentPayment([FromQuery] string consumerName, [FromQuery] string partnerName)
+    {
+
+        return Ok();
     }
 
 }
