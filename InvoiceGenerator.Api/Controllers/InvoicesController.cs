@@ -26,7 +26,8 @@ public class InvoicesController : ControllerBase
     private readonly IGetBillHistortyInfo _getInvoiceDetail;
     private readonly IpurchaseOrderEntryService _purchaseOrderEntry;
     private readonly IAddPurchaseConsumerRecord _addPurchaseConsumerRecord;
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord) 
+    private readonly IpurchaseInvoiceList _purchaseInvoiceList;
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -39,6 +40,7 @@ public class InvoicesController : ControllerBase
         _getInvoiceDetail = getBillHistoryInfo;
         _purchaseOrderEntry = purchaseOrder;
         _addPurchaseConsumerRecord =  addPurchaseConsumerRecord;
+        _purchaseInvoiceList = purchaseInvList;
     }
 
     [HttpPost("PaymentEntry")]
@@ -149,11 +151,14 @@ public class InvoicesController : ControllerBase
         await _addPurchaseConsumerRecord.AppendPurchaseOrderAsync(partnerName, consumerDetail);
         return Ok("Consumer Added");
     }
-    [HttpGet()]
-    public async Task<ActionResult<IList<CustomerInfo>>> getPendingPurchasePaymentPayment([FromQuery] string consumerName, [FromQuery] string partnerName)
+    [HttpGet("purchasePaymentPending")]
+    public async Task<IActionResult> GetUnpaidInvoices([FromQuery] string customerName, [FromQuery] string partnerName)
     {
+        if (string.IsNullOrWhiteSpace(customerName))
+            return BadRequest("Customer name is required.");
 
-        return Ok();
+        var invoices = await _purchaseInvoiceList.GetUnpaidOrPartiallyPaidInvoicesAsync(customerName, partnerName);
+        return Ok(invoices);
     }
 
 }

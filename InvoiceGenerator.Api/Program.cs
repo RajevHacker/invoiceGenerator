@@ -112,7 +112,7 @@ builder.Services.AddTransient<ISearchValueService, searchValueService>();
 builder.Services.AddTransient<IGetBillHistortyInfo, GetBillHistortyInfoService>();
 builder.Services.AddTransient<IpurchaseOrderEntryService, purchaseOrderEntryService>();
 builder.Services.AddTransient<IAddPurchaseConsumerRecord, addPurchaseConsumerRecord>();
-
+builder.Services.AddTransient<IpurchaseInvoiceList,purchaseInvoiceListService>();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
