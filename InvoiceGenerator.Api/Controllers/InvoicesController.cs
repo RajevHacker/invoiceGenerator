@@ -27,7 +27,8 @@ public class InvoicesController : ControllerBase
     private readonly IpurchaseOrderEntryService _purchaseOrderEntry;
     private readonly IAddPurchaseConsumerRecord _addPurchaseConsumerRecord;
     private readonly IpurchaseInvoiceList _purchaseInvoiceList;
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList) 
+    private readonly IPurchaseCustomerService _purchaseCustomerService;
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, IPurchaseCustomerService purchaseCustomerService) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -41,6 +42,7 @@ public class InvoicesController : ControllerBase
         _purchaseOrderEntry = purchaseOrder;
         _addPurchaseConsumerRecord =  addPurchaseConsumerRecord;
         _purchaseInvoiceList = purchaseInvList;
+        _purchaseCustomerService = purchaseCustomerService;
     }
 
     [HttpPost("PaymentEntry")]
@@ -151,12 +153,17 @@ public class InvoicesController : ControllerBase
         await _addPurchaseConsumerRecord.AppendPurchaseOrderAsync(partnerName, consumerDetail);
         return Ok("Consumer Added");
     }
+    [HttpGet("getPurchaseCustomerGST")]
+    public async Task<IActionResult> getPurchaseConsumerGST([FromQuery] string consumerName, [FromQuery] string partnerName)
+    {
+        var customerDetail = await _purchaseCustomerService.SearchCustomersAsync(partnerName,consumerName);
+        return Ok(customerDetail);
+    }
     [HttpGet("purchasePaymentPending")]
     public async Task<IActionResult> GetUnpaidInvoices([FromQuery] string customerName, [FromQuery] string partnerName)
     {
         if (string.IsNullOrWhiteSpace(customerName))
             return BadRequest("Customer name is required.");
-
         var invoices = await _purchaseInvoiceList.GetUnpaidOrPartiallyPaidInvoicesAsync(customerName, partnerName);
         return Ok(invoices);
     }
