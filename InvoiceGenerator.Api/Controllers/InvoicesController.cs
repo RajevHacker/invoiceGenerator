@@ -159,6 +159,12 @@ public class InvoicesController : ControllerBase
         var customerDetail = await _purchaseCustomerService.SearchCustomersAsync(partnerName,consumerName);
         return Ok(customerDetail);
     }
+    [HttpPatch("updatePurchaseCustomerGST")]
+    public async Task<IActionResult> upsertPurchaseConsumerGST([FromQuery] string partnerName, [FromBody] purchaseCustomerDetails consumerDetails)
+    {
+        await _purchaseCustomerService.UpsertCustomerAsync(partnerName,consumerDetails);
+        return Ok();
+    }
     [HttpGet("purchasePaymentPending")]
     public async Task<IActionResult> GetUnpaidInvoices([FromQuery] string customerName, [FromQuery] string partnerName)
     {

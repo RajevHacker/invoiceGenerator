@@ -8,10 +8,12 @@ public class PurchaseCustomerService : IPurchaseCustomerService
 {
     private readonly IPartnerConfigurationResolver _partnerConfigurationResolver;
     private readonly SheetsService _sheetsService;
-    public PurchaseCustomerService(IPartnerConfigurationResolver partnerConfig, GoogleServiceFactory serviceFactory)
+    private readonly IGoogleSheetsService _googleSheetsService;
+    public PurchaseCustomerService(IPartnerConfigurationResolver partnerConfig, GoogleServiceFactory serviceFactory, IGoogleSheetsService googleSheetsService)
     {
          _sheetsService = serviceFactory.CreateSheetsService();
         _partnerConfigurationResolver = partnerConfig;
+        _googleSheetsService = googleSheetsService;
     }
     public async Task<List<purchaseCustomerDetails>> SearchCustomersAsync(string partnerName, string consumerName)
     {
@@ -37,8 +39,43 @@ public class PurchaseCustomerService : IPurchaseCustomerService
         return matched ?? new List<purchaseCustomerDetails>();
     }
 
-    public Task UpsertCustomerAsync(string partnerName,purchaseCustomerDetails customer)
+    public async Task UpsertCustomerAsync(string partnerName, purchaseCustomerDetails customer)
     {
-        throw new NotImplementedException();
+        var _config = _partnerConfigurationResolver.GetSettings(partnerName).SheetSettings;
+        var sheetName = _config.Sheets["PurchaseCustomer"];
+        var sheetId = _config.SpreadsheetId;
+
+        string readRange = $"{sheetName}!A:C";
+        var existingRows = await _googleSheetsService.ReadRangeAsync(sheetId, readRange);
+
+        int? matchingRowIndex = null;
+
+        for (int i = 0; i < existingRows.Count; i++)
+        {
+            var row = existingRows[i];
+            if (row.Count > 0 && row[0].ToString().Equals(customer.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                matchingRowIndex = i + 1; // 1-based index for Sheets
+                break;
+            }
+        }
+
+        if (matchingRowIndex.HasValue)
+        {
+            // Update GST (column B) of existing customer
+            string updateRange = $"{sheetName}!B{matchingRowIndex}";
+            await _googleSheetsService.UpdateCellAsync(sheetId, updateRange, customer.gstNumber);
+        }
+        else
+        {
+            // Append new customer row
+            int nextRow = await _googleSheetsService.GetNextRowIndexAsync(sheetId, sheetName);
+            string formula = $"=SUMIF(PurchaseList!A:A,A{nextRow},PurchaseList!O:O)";
+            await _googleSheetsService.AppendRowAsync(
+                sheetId,
+                $"{sheetName}!A:C", // Range
+                new List<object> { customer.Name, customer.gstNumber, formula }
+            );
+        }
     }
 }
