@@ -29,8 +29,16 @@ public class InvoicesController : ControllerBase
     private readonly IpurchaseInvoiceList _purchaseInvoiceList;
     private readonly IPurchaseCustomerService _purchaseCustomerService;
     private readonly IGetPurchaseList _getPurchaseList;
+    private readonly IGetSalesList _getSalesList;
     
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList) 
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService,
+                             ICustomerInfoService customerService, IProductService productService, 
+                             InvoiceService invoiceService, ILogger<InvoicesController> logger, 
+                             IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, 
+                             IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, 
+                             IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, 
+                             IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList,
+                             IGetSalesList getSalesList) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -46,6 +54,7 @@ public class InvoicesController : ControllerBase
         _purchaseInvoiceList = purchaseInvList;
         _purchaseCustomerService = purchaseCustomerService;
         _getPurchaseList = getPurchaseList;
+        _getSalesList = getSalesList;
     }
 
     [HttpPost("PaymentEntry")]
@@ -177,12 +186,21 @@ public class InvoicesController : ControllerBase
         return Ok(invoices);
     }
     [HttpGet("GetPurchaseList")]
-    public async Task<IActionResult> GetInvoices([FromQuery] string partnerName,
+    public async Task<IActionResult> GetPurchaseList([FromQuery] string partnerName,
         [FromQuery] string? customerName,
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate)
     {
         var result = await _getPurchaseList.getPurchaseList(partnerName, customerName, startDate, endDate);
+        return Ok(result);
+    }
+    [HttpGet("GetSalesList")]
+    public async Task<IActionResult> GetSalesList([FromQuery] string partnerName,
+        [FromQuery] string? customerName,
+        [FromQuery] DateTime? startDate,
+        [FromQuery] DateTime? endDate)
+    {
+        var result = await _getSalesList.getSalesList(partnerName, customerName, startDate, endDate);
         return Ok(result);
     }
 }
