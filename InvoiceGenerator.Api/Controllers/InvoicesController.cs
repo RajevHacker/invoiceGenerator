@@ -28,7 +28,9 @@ public class InvoicesController : ControllerBase
     private readonly IAddPurchaseConsumerRecord _addPurchaseConsumerRecord;
     private readonly IpurchaseInvoiceList _purchaseInvoiceList;
     private readonly IPurchaseCustomerService _purchaseCustomerService;
-    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, IPurchaseCustomerService purchaseCustomerService) 
+    private readonly IGetPurchaseList _getPurchaseList;
+    
+    public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService, ICustomerInfoService customerService, IProductService productService, InvoiceService invoiceService, ILogger<InvoicesController> logger, IInvoiceCancellationService invoiceCancellation, ISearchValueService searchValueService, IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -43,6 +45,7 @@ public class InvoicesController : ControllerBase
         _addPurchaseConsumerRecord =  addPurchaseConsumerRecord;
         _purchaseInvoiceList = purchaseInvList;
         _purchaseCustomerService = purchaseCustomerService;
+        _getPurchaseList = getPurchaseList;
     }
 
     [HttpPost("PaymentEntry")]
@@ -173,5 +176,13 @@ public class InvoicesController : ControllerBase
         var invoices = await _purchaseInvoiceList.GetUnpaidOrPartiallyPaidInvoicesAsync(customerName, partnerName);
         return Ok(invoices);
     }
-
+    [HttpGet("GetPurchaseList")]
+    public async Task<IActionResult> GetInvoices([FromQuery] string partnerName,
+        [FromQuery] string? customerName,
+        [FromQuery] DateTime? startDate,
+        [FromQuery] DateTime? endDate)
+    {
+        var result = await _getPurchaseList.getPurchaseList(partnerName, customerName, startDate, endDate);
+        return Ok(result);
+    }
 }

@@ -114,6 +114,7 @@ builder.Services.AddTransient<IpurchaseOrderEntryService, purchaseOrderEntryServ
 builder.Services.AddTransient<IAddPurchaseConsumerRecord, addPurchaseConsumerRecord>();
 builder.Services.AddTransient<IpurchaseInvoiceList,purchaseInvoiceListService>();
 builder.Services.AddTransient<IPurchaseCustomerService, PurchaseCustomerService>();
+builder.Services.AddTransient<IGetPurchaseList, getPurchaseListService>();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
