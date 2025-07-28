@@ -85,12 +85,6 @@ builder.Services.AddSingleton(sp =>
     var factory = sp.GetRequiredService<GoogleServiceFactory>();
     return factory.CreateSheetsService();
 }); // ToDO: I am not sure why we have this kind
-builder.Services.AddScoped<DriveService>(provider =>
-{
-    var factory = provider.GetRequiredService<GoogleServiceFactory>();
-    return factory.CreateDriveService();
-});
-
 builder.Services.AddSingleton<GoogleServiceFactory>();
 builder.Services.AddTransient<IGoogleSheetsService, GoogleSheetsService>();
 builder.Services.AddTransient<IPaymentSheetService, PaymentSheetService>();

@@ -7,14 +7,12 @@ using Google.Apis.Auth.OAuth2;
 
 public class FileDownloader : IFileDownloader
 {
-    private readonly GoogleCredential _credential;
-    private readonly DriveService _driveService;
+    private readonly GoogleCredential _credential;    
     private readonly ILogger<FileDownloader> _logger;
 
     public FileDownloader(GoogleServiceFactory factory, ILogger<FileDownloader> logger)
     {
          _credential = factory.GetCredential(); 
-        _driveService =  factory.CreateDriveService();
         _logger = logger;
     }
 

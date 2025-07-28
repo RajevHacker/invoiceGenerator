@@ -26,40 +26,6 @@ public class GoogleServiceFactory
             ApplicationName = "Invoice Generator API"
         });
     }
-
-    public DriveService CreateDriveService()
-    {
-        var credential = GetCredential();
-        return new DriveService(new BaseClientService.Initializer
-        {
-            HttpClientInitializer = credential,
-            ApplicationName = "Invoice Generator API"
-        });
-    }
-    
-
-    // private ServiceAccountCredential GetCredential()
-    // {
-    //     var json = new StringBuilder()
-    //         .AppendLine("{")
-    //         .AppendLine($"\"type\": \"service_account\",")
-    //         .AppendLine($"\"project_id\": \"{_settings.ProjectId}\",")
-    //         .AppendLine($"\"private_key_id\": \"{_settings.PrivateKeyId}\",")
-    //         .AppendLine($"\"private_key\": \"{_settings.PrivateKey.Replace("\\n", "\n")}\",")
-    //         .AppendLine($"\"client_email\": \"{_settings.ClientEmail}\",")
-    //         .AppendLine($"\"client_id\": \"{_settings.ClientId}\",")
-    //         .AppendLine($"\"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",")
-    //         .AppendLine($"\"token_uri\": \"{_settings.TokenUri}\",")
-    //         .AppendLine($"\"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",")
-    //         .AppendLine($"\"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/{Uri.EscapeDataString(_settings.ClientEmail)}\"")
-    //         .AppendLine("}")
-    //         .ToString();
-
-    //     return GoogleCredential.FromJson(json)
-    //         .CreateScoped(_settings.Scopes)
-    //         .UnderlyingCredential as ServiceAccountCredential;
- 
-    // }
     public GoogleCredential GetCredential()
     {
         var json = new StringBuilder()
