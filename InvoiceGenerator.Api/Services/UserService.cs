@@ -9,7 +9,6 @@ public class UserService : IUserService
 {
     private readonly IGoogleSheetsService _googleSheetsService;
     private readonly IPartnerConfigurationResolver _partnerResolver;
-
     public UserService(
         IGoogleSheetsService googleSheetsService,
         IPartnerConfigurationResolver partnerResolver)
@@ -22,9 +21,8 @@ public class UserService : IUserService
     {
         var _config = _partnerResolver.GetSettings(partnerName).SheetSettings;
         var spreadsheetId = _config.SpreadsheetId;
-        // var sheetName = settings.Sheets.ContainsKey("User") ? settings.Sheets["User"] : "User";
         var sheetName = _config.Sheets["User"];
-        var range = $"'{sheetName}'!A2:B100"; // Username in A, Password in B
+        var range = $"{sheetName}!A2:B100";
 
         var users = await _googleSheetsService.ReadRangeAsync(spreadsheetId, range);
         if (users == null || users.Count == 0) return false;

@@ -28,8 +28,6 @@ public class InvoicePdfExporter : IInvoicePdfExporter
         var exportUrl = _sheetsExporter.GenerateExportUrl(spreadsheetId, gid);
         var pdfStream = await _fileDownloader.DownloadSingleSheetPdfAsync(exportUrl);
         var a = await _driveUploader.UploadFileAsync(pdfStream, fileName, "application/pdf", folderId);
-        System.Console.WriteLine("============");
-        System.Console.WriteLine(a);
         return a;
     }
 }

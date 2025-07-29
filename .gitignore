@@ -88,3 +88,5 @@ obj/
 *.suo
 *.pdb
 *.env
+tokens/
+token_store/

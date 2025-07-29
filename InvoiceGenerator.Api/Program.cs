@@ -1,10 +1,7 @@
 using System.Text;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
 using InvoiceGenerator.Api.Models;
 using InvoiceGenerator.Api.Services;
 using InvoiceGenerator.Api.Services.Interfaces;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -80,12 +77,6 @@ builder.Services.Configure<GoogleApiSettings>(builder.Configuration.GetSection("
 
 // Register your services
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton(sp =>
-{
-    var factory = sp.GetRequiredService<GoogleServiceFactory>();
-    return factory.CreateSheetsService();
-}); // ToDO: I am not sure why we have this kind
-builder.Services.AddSingleton<GoogleServiceFactory>();
 builder.Services.AddTransient<IGoogleSheetsService, GoogleSheetsService>();
 builder.Services.AddTransient<IPaymentSheetService, PaymentSheetService>();
 builder.Services.AddTransient<IBillHistorySheetService, BillHistorySheetService>();
