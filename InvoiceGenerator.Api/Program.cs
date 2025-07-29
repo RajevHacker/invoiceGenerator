@@ -77,6 +77,7 @@ builder.Services.Configure<GoogleApiSettings>(builder.Configuration.GetSection("
 
 // Register your services
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<GoogleAuthorizationService>();
 builder.Services.AddTransient<IGoogleSheetsService, GoogleSheetsService>();
 builder.Services.AddTransient<IPaymentSheetService, PaymentSheetService>();
 builder.Services.AddTransient<IBillHistorySheetService, BillHistorySheetService>();

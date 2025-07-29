@@ -17,33 +17,27 @@ public class GoogleSheetsService : IGoogleSheetsService
     private const string CredentialsFile = "credentials.json";
     private const string TokenFolder = "tokens";
 
-    private readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
+    // private readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
+    private readonly GoogleAuthorizationService _authService;
 
-    public GoogleSheetsService(ILogger<GoogleSheetsService> logger)
+    public GoogleSheetsService(ILogger<GoogleSheetsService> logger, GoogleAuthorizationService googleAuthorizationService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _authService = googleAuthorizationService;
     }
     public async Task InitSheetsServiceAsync()
     {
+        var scopes = new[]
+        {
+            Google.Apis.Sheets.v4.SheetsService.Scope.Spreadsheets,
+            Google.Apis.Drive.v3.DriveService.Scope.Drive  // Use full Drive access
+        };
         if (_sheetsService != null) return;
 
         try
         {
-            using var stream = new FileStream(CredentialsFile, FileMode.Open, FileAccess.Read);
-
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.FromStream(stream).Secrets,
-                Scopes,
-                "user",
-                CancellationToken.None,
-                new FileDataStore(TokenFolder, true));
-
-            _sheetsService = new SheetsService(new BaseClientService.Initializer
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName
-            });
-
+            var credential = await _authService.GetUserCredentialAsync(scopes);
+            _sheetsService = new SheetsService(_authService.GetServiceInitializer(credential, ApplicationName));
             _logger.LogInformation("✅ Google Sheets API authorized.");
         }
         catch (Exception ex)

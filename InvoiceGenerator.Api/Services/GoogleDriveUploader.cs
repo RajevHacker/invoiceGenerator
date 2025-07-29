@@ -14,11 +14,17 @@ namespace InvoiceGenerator.Api.Services
 {
     public class GoogleDriveUploader: IDriveUploader
     {
-        private readonly string[] Scopes = { DriveService.Scope.DriveFile };
+        private readonly string[] Scopes = { DriveService.Scope.Drive };
         private readonly string ApplicationName = "DriveUploaderAPI";
-        private readonly string TargetFolderId = "1S5QZi31_OeKfQRsBMi6Sr0ML_rBEpckR"; // Replace with your folder ID
+        private readonly GoogleAuthorizationService _authService;
+        private readonly ILogger<GoogleDriveUploader> _logger;
 
         private DriveService? _driveService;
+        public GoogleDriveUploader(ILogger<GoogleDriveUploader> logger, GoogleAuthorizationService googleAuthorizationService)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _authService = googleAuthorizationService;
+        }
 
         // public async Task<string> UploadFileAsync(IFormFile formFile)
         public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string mimeType, string folderId)
@@ -31,14 +37,12 @@ namespace InvoiceGenerator.Api.Services
                 Name = fileName,
                 Parents = new List<string> { folderId }
             };
-
+            if (_driveService == null)
+                throw new InvalidOperationException("DriveService not initialized.");
             var request = _driveService.Files.Create(fileMetadata, fileStream, mimeType);
             request.Fields = "id";
             await request.UploadAsync();
-
             var uploadedFileId = request.ResponseBody.Id;
-
-            // Optional: make file publicly viewable
             var permission = new Permission
             {
                 Type = "anyone",
@@ -82,66 +86,39 @@ namespace InvoiceGenerator.Api.Services
         {
             if (_driveService == null)
                 await InitDriveServiceAsync();
-
-            if (string.IsNullOrWhiteSpace(fileId) || string.IsNullOrWhiteSpace(newFolderId))
+            // Step 1: Get current parents
+            var getRequest = _driveService.Files.Get(fileId);
+            getRequest.Fields = "parents";
+            var file = await getRequest.ExecuteAsync();
+            var previousParents = file.Parents != null && file.Parents.Any()
+                ? string.Join(",", file.Parents)
+                : null;
+            // Step 2: Move the file by changing parents
+            var updateRequest = _driveService.Files.Update(new File(), fileId);
+            updateRequest.AddParents = newFolderId;
+            updateRequest.RemoveParents = previousParents;
+            updateRequest.Fields = "id, parents";
+            var updatedFile = await updateRequest.ExecuteAsync();
+        }
+        public async Task InitDriveServiceAsync()
+        {
+            var scopes = new[]
             {
-                // _logger.LogWarning("FileId or NewFolderId is missing.");
-                // return Ok();
-            }
-
+                Google.Apis.Sheets.v4.SheetsService.Scope.Spreadsheets,
+                Google.Apis.Drive.v3.DriveService.Scope.Drive
+            };
+            if (_driveService != null) return;
             try
             {
-                // Step 1: Get current parents
-                var getRequest = _driveService.Files.Get(fileId);
-                getRequest.Fields = "parents";
-                var file = await getRequest.ExecuteAsync();
-
-                var previousParents = file.Parents != null && file.Parents.Any()
-                    ? string.Join(",", file.Parents)
-                    : null;
-
-                if (previousParents == null)
-                {
-                    // _logger.LogWarning("File {FileId} has no parent folders.", fileId);
-                    // return false;
-                }
-
-                // Step 2: Move the file by changing parents
-                var updateRequest = _driveService.Files.Update(new File(), fileId);
-                updateRequest.AddParents = newFolderId;
-                updateRequest.RemoveParents = previousParents;
-                updateRequest.Fields = "id, parents";
-
-                var updatedFile = await updateRequest.ExecuteAsync();
-
-                // _logger.LogInformation("✅ File {FileId} moved from folder {OldFolderId} to {NewFolderId}.", fileId, oldFolderId, newFolderId);
-                // return true;
+                var credential = await _authService.GetUserCredentialAsync(scopes);
+                _driveService = new DriveService(_authService.GetServiceInitializer(credential, ApplicationName));
+                _logger.LogInformation("✅ Google Drive API authorized.");
             }
             catch (Exception ex)
             {
-                // _logger.LogError(ex, "❌ Failed to move file {FileId} from {OldFolderId} to {NewFolderId}", fileId, oldFolderId, newFolderId);
-                // return false;
+                _logger.LogError(ex, "❌ Failed to initialize Google Drive API.");
+                throw;
             }
-        }
-
-
-        public async Task InitDriveServiceAsync()
-        {
-            using var stream = new FileStream("credentials.json", FileMode.Open, FileAccess.Read);
-            var credPath = "token_store";
-
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.FromStream(stream).Secrets,
-                Scopes,
-                "user",
-                CancellationToken.None,
-                new FileDataStore(credPath, true));
-
-            _driveService = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
         }
     }
 }
