@@ -73,8 +73,7 @@ builder.Services.AddAuthentication(options =>
 // Register other settings now
 builder.Services.Configure<SheetSettings>(builder.Configuration.GetSection("SheetSettings"));
 builder.Services.Configure<GoogleDriveSettings>(builder.Configuration.GetSection("GoogleDriveSettings"));
-builder.Services.Configure<GoogleApiSettings>(builder.Configuration.GetSection("GoogleApi"));
-
+builder.Services.Configure<DriveOAuthCred>(builder.Configuration.GetSection("DriveOAuthCred"));
 // Register your services
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<GoogleAuthorizationService>();
