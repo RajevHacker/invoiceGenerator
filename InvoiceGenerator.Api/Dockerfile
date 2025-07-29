@@ -22,6 +22,9 @@ COPY --from=build /app/publish .
 # Copy the secure encrypted settings file into the container
 COPY Config/secure.Development.appsettings.json ./Config/secure.Development.appsettings.json
 
+# Copy the token_store directory (OAuth token cache)
+COPY token_store ./token_store
+
 # Set environment variables (can be overridden by docker-compose)
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ENCRYPTED_JSON_CONFIG=/app/Config/secure.Development.appsettings.json
