@@ -101,6 +101,7 @@ builder.Services.AddTransient<IpurchaseInvoiceList,purchaseInvoiceListService>()
 builder.Services.AddTransient<IPurchaseCustomerService, PurchaseCustomerService>();
 builder.Services.AddTransient<IGetPurchaseList, getPurchaseListService>();
 builder.Services.AddTransient<IGetSalesList, getSalesListService>();
+builder.Services.AddTransient<IGetRecentPaymentTransaction, GetRecentPaymentTransaction>();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 

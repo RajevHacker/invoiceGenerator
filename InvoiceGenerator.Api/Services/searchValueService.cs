@@ -30,11 +30,14 @@ public class searchValueService : ISearchValueService
         {
             searchColumn = "C";
         }
+        else if (sheetName == "Products")
+        {
+            searchColumn = "A";
+        }
         else
         {
             searchColumn = "A";
         }
-
         Console.WriteLine(searchColumn);
 
         var queryValue = await _googleSheetsService.GetColumnValuesAsync(

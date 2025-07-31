@@ -33,6 +33,7 @@ public class InvoicesController : ControllerBase
     private readonly IGetPurchaseList _getPurchaseList;
     private readonly IGetSalesList _getSalesList;
     private readonly IInvoiceNumberGenerator _invoiceNumberGenerator;
+    private readonly IGetRecentPaymentTransaction _getRecentPaymentTransaction;
     
     public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService,
                              ICustomerInfoService customerService, IProductService productService, 
@@ -41,7 +42,8 @@ public class InvoicesController : ControllerBase
                              IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, 
                              IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, 
                              IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList,
-                             IGetSalesList getSalesList, IInvoiceNumberGenerator invoiceNumberGenerator) 
+                             IGetSalesList getSalesList, IInvoiceNumberGenerator invoiceNumberGenerator,
+                             IGetRecentPaymentTransaction getRecentPaymentTransaction) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -59,6 +61,7 @@ public class InvoicesController : ControllerBase
         _getPurchaseList = getPurchaseList;
         _getSalesList = getSalesList;
         _invoiceNumberGenerator = invoiceNumberGenerator;
+        _getRecentPaymentTransaction = getRecentPaymentTransaction;
     }
 
     [HttpPost("PaymentEntry")]
@@ -218,5 +221,11 @@ public class InvoicesController : ControllerBase
     {
         var invoiceNumber = await _invoiceNumberGenerator.GenerateNextInvoiceNumberAsync(partnerName);
         return invoiceNumber;
+    }
+    [HttpGet("GetRecentPaymentTransaction")]
+    public async Task<IActionResult> GetRecentPaymentTransaction(string partnerName, string paymentType)
+    {
+        var result = await _getRecentPaymentTransaction.getPaymentReport(partnerName,paymentType);
+        return Ok(result);
     }
 }

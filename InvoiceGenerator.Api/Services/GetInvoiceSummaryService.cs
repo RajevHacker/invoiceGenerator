@@ -40,9 +40,7 @@ public class GetInvoiceSummaryService : IGetInvoiceSummary
             $"{sheetName}!F38",  // IGST
             $"{sheetName}!F40"   // GrandTotal
         };
-
         var values = new List<string>();
-        System.Console.WriteLine(values);
         foreach (var cell in cells)
         {
             var result = await _sheetsService.GetSheetValuesAsync(spreadsheetId, cell);
@@ -56,7 +54,7 @@ public class GetInvoiceSummaryService : IGetInvoiceSummary
             InvoiceNumber = values.ElementAtOrDefault(2),
             Date = DateOnly.TryParseExact(
                 values.ElementAtOrDefault(3),
-                "dd/MM/yyyy",
+                "dd-MMM-yyyy",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out var date
