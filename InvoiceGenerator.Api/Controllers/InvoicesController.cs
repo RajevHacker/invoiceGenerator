@@ -4,10 +4,12 @@ using InvoiceGenerator.Api.Services;
 using InvoiceGenerator.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Bcpg.Sig;
+using System.Reflection.Metadata.Ecma335;
 
 namespace InvoiceGenerator.Api.Controllers;
 [Authorize]
@@ -30,6 +32,7 @@ public class InvoicesController : ControllerBase
     private readonly IPurchaseCustomerService _purchaseCustomerService;
     private readonly IGetPurchaseList _getPurchaseList;
     private readonly IGetSalesList _getSalesList;
+    private readonly IInvoiceNumberGenerator _invoiceNumberGenerator;
     
     public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService,
                              ICustomerInfoService customerService, IProductService productService, 
@@ -38,7 +41,7 @@ public class InvoicesController : ControllerBase
                              IGetBillHistortyInfo getBillHistoryInfo, IpurchaseOrderEntryService purchaseOrder, 
                              IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, 
                              IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList,
-                             IGetSalesList getSalesList) 
+                             IGetSalesList getSalesList, IInvoiceNumberGenerator invoiceNumberGenerator) 
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -55,6 +58,7 @@ public class InvoicesController : ControllerBase
         _purchaseCustomerService = purchaseCustomerService;
         _getPurchaseList = getPurchaseList;
         _getSalesList = getSalesList;
+        _invoiceNumberGenerator = invoiceNumberGenerator;
     }
 
     [HttpPost("PaymentEntry")]
@@ -155,7 +159,7 @@ public class InvoicesController : ControllerBase
     }
     [HttpPost("AddPurchaseOrder")]
     public async Task<IActionResult> addPurchaseOrder([FromQuery] string partnerName, [FromBody] purchaseOrderEntry entry)
-    {        
+    {
         await _purchaseOrderEntry.AppendPurchaseOrderAsync(partnerName, entry);
         return Ok("Added Purchase Order.");
     }
@@ -200,7 +204,19 @@ public class InvoicesController : ControllerBase
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate)
     {
+        System.Console.WriteLine("SALESLIST");
         var result = await _getSalesList.getSalesList(partnerName, customerName, startDate, endDate);
+        string jsonResult = JsonSerializer.Serialize(result, new JsonSerializerOptions
+        {
+            WriteIndented = true // Makes it pretty-printed in logs
+        });
+        Console.WriteLine("Sales List Result:\n" + jsonResult);
         return Ok(result);
+    }
+    [HttpGet("GetInvoiceNumber")]
+    public async Task<string> GetNextInvoiceNumber(string partnerName)
+    {
+        var invoiceNumber = await _invoiceNumberGenerator.GenerateNextInvoiceNumberAsync(partnerName);
+        return invoiceNumber;
     }
 }

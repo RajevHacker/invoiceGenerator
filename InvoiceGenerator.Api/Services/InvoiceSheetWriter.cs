@@ -27,7 +27,10 @@ public class InvoiceSheetWriter : IInvoiceSheetWriter
         {
             [$"{sheetName}!B9"] = request.Name,
             [$"{sheetName}!E9"] = request.invoiceNumber,
-            [$"{sheetName}!E10"] = request.CurrentDate.ToString("dd/MM/yyyy"),
+            // [$"{sheetName}!E10"] = request.CurrentDate.ToString("dd-MMM-yyyy"),
+            [$"{sheetName}!E10"] = request.CurrentDate != default
+                ? request.CurrentDate.ToString("dd-MMM-yyyy")
+                : "",
             [$"{sheetName}!E12"] = request.NoOfBales,
             [$"{sheetName}!E13"] = request.Transport
         };
@@ -67,59 +70,4 @@ public class InvoiceSheetWriter : IInvoiceSheetWriter
 
         await _sheetsService.BatchUpdateAsync(spreadsheetId, clears);
     }
-    
-    // public async Task WriteInvoiceToSheetAsync(InvoiceRequest request)
-    // {
-    //     string sheetName = _settings.Sheets["Invoice"];
-    //     string spreadsheetId = _settings.SpreadsheetId;
-
-    //     var updates = new Dictionary<string, object>
-    //     {
-    //         [$"{sheetName}!B9"] = request.Name,
-    //         [$"{sheetName}!E9"] = "TestInvNumber",
-    //         [$"{sheetName}!E10"] = request.CurrentDate.ToString("dd/MM/yyyy"),
-    //         [$"{sheetName}!E12"] = request.NoOfBales,
-    //         [$"{sheetName}!E13"] = request.Transport
-    //     };
-
-    //     foreach (var (item, index) in request.Items.Select((x, i) => (x, i)))
-    //     {
-    //         int row = 16 + index;
-    //         updates[$"{sheetName}!B{row}"] = item.ProductName;
-    //         updates[$"{sheetName}!D{row}"] = item.Qty;
-    //         updates[$"{sheetName}!E{row}"] = item.Price;
-    //     }
-
-    //     foreach (var (cell, value) in updates)
-    //     {
-    //         await _sheetsService.UpdateCellAsync(spreadsheetId, cell, value);
-    //     }
-    // }
-    // public async Task ClearInvoiceFieldsAsync()
-    // {
-    //     string sheetName = _settings.Sheets["Invoice"];
-    //     string spreadsheetId = _settings.SpreadsheetId;
-
-    //     var clears = new Dictionary<string, object>
-    //     {
-    //         [$"{sheetName}!B9"] = "",
-    //         [$"{sheetName}!E9"] = "",
-    //         [$"{sheetName}!E10"] = "",
-    //         [$"{sheetName}!E12"] = "",
-    //         [$"{sheetName}!E13"] = ""
-    //     };
-
-    //     // Clear rows B16 to B31, D16 to D31, E16 to E31
-    //     for (int row = 16; row <= 31; row++)
-    //     {
-    //         clears[$"{sheetName}!B{row}"] = "";
-    //         clears[$"{sheetName}!D{row}"] = "";
-    //         clears[$"{sheetName}!E{row}"] = "";
-    //     }
-
-    //     foreach (var (cell, value) in clears)
-    //     {
-    //         await _sheetsService.UpdateCellAsync(spreadsheetId, cell, value);
-    //     }
-    // }
 }

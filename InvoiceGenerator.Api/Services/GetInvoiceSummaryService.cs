@@ -1,3 +1,4 @@
+using System.Globalization;
 using InvoiceGenerator.Api.Models;
 using InvoiceGenerator.Api.Services.Interfaces;
 using Microsoft.Extensions.Options;
@@ -53,7 +54,13 @@ public class GetInvoiceSummaryService : IGetInvoiceSummary
             CustomerName = values.ElementAtOrDefault(0),
             GSTNumber = values.ElementAtOrDefault(1),
             InvoiceNumber = values.ElementAtOrDefault(2),
-            Date = DateOnly.TryParse(values.ElementAtOrDefault(3), out var date) ? date : null,
+            Date = DateOnly.TryParseExact(
+                values.ElementAtOrDefault(3),
+                "dd/MM/yyyy",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var date
+            ) ? date : null,
             Qty = int.TryParse(values.ElementAtOrDefault(4), out var qty) ? qty : null,
             TotalBeforeGST = decimal.TryParse(values.ElementAtOrDefault(5), out var total) ? total : null,
             CGST = decimal.TryParse(values.ElementAtOrDefault(6), out var cgst) ? cgst : null,
