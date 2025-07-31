@@ -34,6 +34,10 @@ public class searchValueService : ISearchValueService
         {
             searchColumn = "A";
         }
+        else if (sheetName == "PurchaseCustomer")
+        {
+            searchColumn = "A";
+        }
         else
         {
             searchColumn = "A";
