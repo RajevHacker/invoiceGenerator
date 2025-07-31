@@ -34,6 +34,7 @@ public class InvoicesController : ControllerBase
     private readonly IGetSalesList _getSalesList;
     private readonly IInvoiceNumberGenerator _invoiceNumberGenerator;
     private readonly IGetRecentPaymentTransaction _getRecentPaymentTransaction;
+    private readonly IGetDashboardSummaryService _getDashboardSummary;
     
     public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService,
                              ICustomerInfoService customerService, IProductService productService, 
@@ -43,7 +44,7 @@ public class InvoicesController : ControllerBase
                              IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, 
                              IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList,
                              IGetSalesList getSalesList, IInvoiceNumberGenerator invoiceNumberGenerator,
-                             IGetRecentPaymentTransaction getRecentPaymentTransaction) 
+                             IGetRecentPaymentTransaction getRecentPaymentTransaction, IGetDashboardSummaryService getDashboardSummary)
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -62,6 +63,7 @@ public class InvoicesController : ControllerBase
         _getSalesList = getSalesList;
         _invoiceNumberGenerator = invoiceNumberGenerator;
         _getRecentPaymentTransaction = getRecentPaymentTransaction;
+        _getDashboardSummary = getDashboardSummary;
     }
 
     [HttpPost("PaymentEntry")]
@@ -227,5 +229,11 @@ public class InvoicesController : ControllerBase
     {
         var result = await _getRecentPaymentTransaction.getPaymentReport(partnerName,paymentType);
         return Ok(result);
+    }
+    [HttpGet("DashBoardSummary")]
+    public async Task<ActionResult<DashboardSummary>> GetDashboardSummary(string partnerName)
+    {
+        var summary = await _getDashboardSummary.GetDashboardSummaryAsync(partnerName);
+        return Ok(summary);
     }
 }
