@@ -4,12 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace InvoiceGenerator.Api.Services;
 
-public class purchaseInvoiceListService : IpurchaseInvoiceList
+public class salesInvoiceListService : IsalesInvoiceList
 {
     private readonly IGoogleSheetsService _sheetsService;
     public IPartnerConfigurationResolver _partnerconfig;
 
-    public purchaseInvoiceListService(IGoogleSheetsService sheetsService, IPartnerConfigurationResolver partnerConfig)
+    public salesInvoiceListService(IGoogleSheetsService sheetsService, IPartnerConfigurationResolver partnerConfig)
     {
         _sheetsService = sheetsService;
         _partnerconfig = partnerConfig;
@@ -17,7 +17,7 @@ public class purchaseInvoiceListService : IpurchaseInvoiceList
     public async Task<List<purchaseInvoiceList>> GetUnpaidOrPartiallyPaidInvoicesAsync(string customerName, string partnerName)
     {
         var _config = _partnerconfig.GetSettings(partnerName).SheetSettings;
-        var SheetName = _config.Sheets["PurchaseList"];
+        var SheetName = _config.Sheets["BillHistory"];
         var spreadsheetId = _config.SpreadsheetId;
 
         // Step 1: Get headers
@@ -49,10 +49,10 @@ public class purchaseInvoiceListService : IpurchaseInvoiceList
             results.Add(new purchaseInvoiceList
             {
                 CustomerName = name,
-                InvoiceNumber = GetCell(row, columnMap, "InvoiceNumber"),
+                InvoiceNumber = GetCell(row, columnMap, "Invoice Number"),
                 Date = GetCell(row, columnMap, "Date"),
-                GrandTotal = ParseDecimal(GetCell(row, columnMap, "GrandTotal")),
-                BalanceAmount = ParseDecimal(GetCell(row, columnMap, "InvoiceBalance")),
+                GrandTotal = ParseDecimal(GetCell(row, columnMap, "Grand Total")),
+                BalanceAmount = ParseDecimal(GetCell(row, columnMap, "StatusFlag")),
                 PaymentStatus = GetCell(row, columnMap, "Payment Status")
             });
         }

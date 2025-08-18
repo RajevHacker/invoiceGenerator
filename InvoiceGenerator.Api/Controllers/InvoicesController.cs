@@ -35,6 +35,7 @@ public class InvoicesController : ControllerBase
     private readonly IInvoiceNumberGenerator _invoiceNumberGenerator;
     private readonly IGetRecentPaymentTransaction _getRecentPaymentTransaction;
     private readonly IGetDashboardSummaryService _getDashboardSummary;
+    private readonly IsalesInvoiceList _salesInvoiceList;
     
     public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService,
                              ICustomerInfoService customerService, IProductService productService, 
@@ -44,7 +45,8 @@ public class InvoicesController : ControllerBase
                              IAddPurchaseConsumerRecord addPurchaseConsumerRecord, IpurchaseInvoiceList purchaseInvList, 
                              IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList,
                              IGetSalesList getSalesList, IInvoiceNumberGenerator invoiceNumberGenerator,
-                             IGetRecentPaymentTransaction getRecentPaymentTransaction, IGetDashboardSummaryService getDashboardSummary)
+                             IGetRecentPaymentTransaction getRecentPaymentTransaction, IGetDashboardSummaryService getDashboardSummary,
+                             IsalesInvoiceList salesInvoiceList)
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -64,6 +66,7 @@ public class InvoicesController : ControllerBase
         _invoiceNumberGenerator = invoiceNumberGenerator;
         _getRecentPaymentTransaction = getRecentPaymentTransaction;
         _getDashboardSummary = getDashboardSummary;
+        _salesInvoiceList = salesInvoiceList;
     }
 
     [HttpPost("PaymentEntry")]
@@ -234,6 +237,13 @@ public class InvoicesController : ControllerBase
     public async Task<ActionResult<DashboardSummary>> GetDashboardSummary(string partnerName)
     {
         var summary = await _getDashboardSummary.GetDashboardSummaryAsync(partnerName);
+        return Ok(summary);
+    }
+    [HttpGet("getSalesBalanceList")]
+    public async Task<ActionResult<DashboardSummary>> GetSalesBalanceList(string partnerName, string customerName)
+    {
+        System.Console.WriteLine("test Message");
+        var summary = await _salesInvoiceList.GetUnpaidOrPartiallyPaidInvoicesAsync(customerName, partnerName);
         return Ok(summary);
     }
 }
