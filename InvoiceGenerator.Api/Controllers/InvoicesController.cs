@@ -36,6 +36,7 @@ public class InvoicesController : ControllerBase
     private readonly IGetRecentPaymentTransaction _getRecentPaymentTransaction;
     private readonly IGetDashboardSummaryService _getDashboardSummary;
     private readonly IsalesInvoiceList _salesInvoiceList;
+    private readonly IresetFinancialYearInterface _resetFinancialYr;
     
     public InvoicesController(IPaymentSheetService paymentSheetService, IBillHistorySheetService billHistorySheetService,
                              ICustomerInfoService customerService, IProductService productService, 
@@ -46,7 +47,7 @@ public class InvoicesController : ControllerBase
                              IPurchaseCustomerService purchaseCustomerService, IGetPurchaseList getPurchaseList,
                              IGetSalesList getSalesList, IInvoiceNumberGenerator invoiceNumberGenerator,
                              IGetRecentPaymentTransaction getRecentPaymentTransaction, IGetDashboardSummaryService getDashboardSummary,
-                             IsalesInvoiceList salesInvoiceList)
+                             IsalesInvoiceList salesInvoiceList, IresetFinancialYearInterface resetFinancialYr)
     {
         _paymentSheetService = paymentSheetService;
         _billHistorySheetService = billHistorySheetService;
@@ -67,6 +68,7 @@ public class InvoicesController : ControllerBase
         _getRecentPaymentTransaction = getRecentPaymentTransaction;
         _getDashboardSummary = getDashboardSummary;
         _salesInvoiceList = salesInvoiceList;
+        _resetFinancialYr = resetFinancialYr;
     }
 
     [HttpPost("PaymentEntry")]
@@ -245,5 +247,11 @@ public class InvoicesController : ControllerBase
         System.Console.WriteLine("test Message");
         var summary = await _salesInvoiceList.GetUnpaidOrPartiallyPaidInvoicesAsync(customerName, partnerName);
         return Ok(summary);
+    }
+    [HttpPost("resetFinancialYear")]
+    public async Task<IActionResult> resetfinancialYear(string partnerName, string financialYear)
+    {
+        _resetFinancialYr.resetFinancialYear(partnerName, financialYear);
+        return Ok();
     }
 }
