@@ -14,7 +14,7 @@ public class resetFinancialYearService : IresetFinancialYearInterface
         _partnerconfig = partnerConfig;
     }
     public async Task<string> resetFinancialYear(string partnerName, string newFinancialYear)
-    {
+    {        
         var _config = _partnerconfig.GetSettings(partnerName).SheetSettings;
         var spreadsheetId = _config.SpreadsheetId;
         var UserSheetName = _config.Sheets["User"];
@@ -24,7 +24,7 @@ public class resetFinancialYearService : IresetFinancialYearInterface
         int nextRow = await _sheetsService.GetNextRowIndexAsync(spreadsheetId, billhistortSheetName);
         string billHistoryInvoiceCell = $"{billhistortSheetName}!C{nextRow}"; 
         string newFinancialYearCell = $"{billhistortSheetName}!A{nextRow}"; 
-        await _sheetsService.UpdateCellAsync(spreadsheetId, newFinancialYearCell, "NEW FINANCIAL YEAR START: " + newFinancialYear);
+        await _sheetsService.UpdateCellAsync(spreadsheetId, newFinancialYearCell, "NEW FINANCIAL YEAR START : " + newFinancialYear);
         await _sheetsService.UpdateCellAsync(spreadsheetId, billHistoryInvoiceCell, 0);
         return "success";
     }
