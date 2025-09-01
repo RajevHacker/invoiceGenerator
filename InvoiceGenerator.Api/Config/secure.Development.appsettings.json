@@ -7,12 +7,12 @@
   },
   "DriveOAuthCred": {
     "installed": {
-      "client_id": "924121361287-7ioi08pdn9auc6echgcqahs9pre8dlel.apps.googleusercontent.com",
-      "project_id": "invoicegenerator-463712",
+      "client_id": "324908222877-nskf69vgen64boav58att1u7mt6h7p87.apps.googleusercontent.com",
+      "project_id": "invoiceapplication-470808",
       "auth_uri": "https://accounts.google.com/o/oauth2/auth",
       "token_uri": "https://oauth2.googleapis.com/token",
       "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-      "client_secret": "![YSj0cr4Rd7hQM0EUBNWsuFfcaD1yB+ESzLHzIFXei9xVQCerWSSKqg==]",
+      "client_secret": "![S9eWpf7+yaF+OAp2QsTFIIiqsPo8zQnJc0vC6GC1na1pI5ClfJf6nQ==]",
       "redirect_uris": [
         "http://localhost"
       ]
