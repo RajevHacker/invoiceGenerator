@@ -8,9 +8,7 @@ services:
     ports:
       - "8081:8080"
     environment:
-      # CONFIG_KEY: ${CONFIG_KEY}                   # Pass secret at runtime via env var
-      CONFIG_KEY: your_secret_key
-      ASPNETCORE_ENVIRONMENT: Development         # Match your config
-      ENCRYPTED_JSON_CONFIG: /app/Config/secure.Development.appsettings.json
+      CONFIG_KEY: ${CONFIG_KEY}
+      ASPNETCORE_ENVIRONMENT: Development
     volumes:
-      - ./token_store:/app/token_store             # Mount token_store to persist OAuth tokens
+      - ./token_store:/app/token_store
