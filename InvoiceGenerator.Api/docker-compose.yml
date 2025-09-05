@@ -10,6 +10,6 @@ services:
     environment:
       # CONFIG_KEY: ${CONFIG_KEY}
       ASPNETCORE_ENVIRONMENT: Development
-      ENV CONFIG_KEY=your_secret_key
+      CONFIG_KEY: your_secret_key
     volumes:
       - ./token_store:/app/token_store
