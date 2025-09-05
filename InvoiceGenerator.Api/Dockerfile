@@ -28,6 +28,7 @@ COPY token_store ./token_store
 # Set environment variables (can be overridden by docker-compose)
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ENCRYPTED_JSON_CONFIG=/app/Config/secure.Development.appsettings.json
+ENV CONFIG_KEY=your_secret_key
 
 # Expose default port
 EXPOSE 8080

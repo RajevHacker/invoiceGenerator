@@ -13,22 +13,24 @@ builder.Services.AddSwaggerGen();
 var env = builder.Environment;
 var key = Environment.GetEnvironmentVariable("CONFIG_KEY");
 
-// Decrypt JSON config first, then add it to Configuration before accessing any config values
-// var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile($"secure.{env.EnvironmentName}.appsettings.json", key);
+if (string.IsNullOrEmpty(key))
+    throw new Exception("CONFIG_KEY is not set.");
 
+// --- Load and decrypt config file ---
+var secureFilePath = Path.Combine(AppContext.BaseDirectory, "Config", $"secure.{env.EnvironmentName}.appsettings.json");
 
-var basePath = AppContext.BaseDirectory; // or Directory.GetCurrentDirectory()
-var encryptedJson = Environment.GetEnvironmentVariable("ENCRYPTED_JSON_CONFIG");
-if (string.IsNullOrEmpty(encryptedJson))
-    throw new Exception("ENCRYPTED_JSON_CONFIG is not set.");
+if (!File.Exists(secureFilePath))
+    throw new FileNotFoundException($"Secure config file not found: {secureFilePath}");
 
-var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile(encryptedJson, key); // Add this overload if needed
+var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile(secureFilePath, key);
 var decryptedStream = new MemoryStream(Encoding.UTF8.GetBytes(decryptedJson));
+
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
     .AddJsonStream(decryptedStream);
 
+// --- CORS ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -40,15 +42,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Now bind JwtSettings after the decrypted config is loaded
+// --- JWT ---
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
-// Validate JwtSettings to avoid null reference exceptions
 if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
-{
     throw new Exception("JWT settings are not configured properly.");
-}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -70,11 +69,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Register other settings now
+// --- Other services ---
 builder.Services.Configure<SheetSettings>(builder.Configuration.GetSection("SheetSettings"));
 builder.Services.Configure<GoogleDriveSettings>(builder.Configuration.GetSection("GoogleDriveSettings"));
 builder.Services.Configure<DriveOAuthCred>(builder.Configuration.GetSection("DriveOAuthCred"));
-// Register your services
+
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<GoogleAuthorizationService>();
 builder.Services.AddTransient<IGoogleSheetsService, GoogleSheetsService>();
@@ -97,7 +96,7 @@ builder.Services.AddTransient<ISearchValueService, searchValueService>();
 builder.Services.AddTransient<IGetBillHistortyInfo, GetBillHistortyInfoService>();
 builder.Services.AddTransient<IpurchaseOrderEntryService, purchaseOrderEntryService>();
 builder.Services.AddTransient<IAddPurchaseConsumerRecord, addPurchaseConsumerRecord>();
-builder.Services.AddTransient<IpurchaseInvoiceList,purchaseInvoiceListService>();
+builder.Services.AddTransient<IpurchaseInvoiceList, purchaseInvoiceListService>();
 builder.Services.AddTransient<IPurchaseCustomerService, PurchaseCustomerService>();
 builder.Services.AddTransient<IGetPurchaseList, getPurchaseListService>();
 builder.Services.AddTransient<IGetSalesList, getSalesListService>();
@@ -105,6 +104,7 @@ builder.Services.AddTransient<IGetRecentPaymentTransaction, GetRecentPaymentTran
 builder.Services.AddTransient<IGetDashboardSummaryService, GetDashboardSummaryService>();
 builder.Services.AddTransient<IsalesInvoiceList, salesInvoiceListService>();
 builder.Services.AddTransient<IresetFinancialYearInterface, resetFinancialYearService>();
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
