@@ -5,24 +5,35 @@ using InvoiceGenerator.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-var builder = WebApplication.CreateBuilder(args);
+// Force default environment to Development if not set
+var envName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+              ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+              ?? "Development";
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", envName);
+Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", envName);
+
+var builder = WebApplication.CreateBuilder(args);
 
 var env = builder.Environment;
 var key = Environment.GetEnvironmentVariable("CONFIG_KEY");
 
-// Decrypt JSON config first, then add it to Configuration before accessing any config values
-// var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile($"secure.{env.EnvironmentName}.appsettings.json", key);
-
-
-var basePath = AppContext.BaseDirectory; // or Directory.GetCurrentDirectory()
+// Load encrypted config from env or file
 var encryptedJson = Environment.GetEnvironmentVariable("ENCRYPTED_JSON_CONFIG");
 if (string.IsNullOrEmpty(encryptedJson))
     throw new Exception("ENCRYPTED_JSON_CONFIG is not set.");
 
-var decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile(encryptedJson, key); // Add this overload if needed
+// If ENCRYPTED_JSON_CONFIG points to a file, use file decrypt; otherwise, treat it as raw content
+string decryptedJson;
+// if (File.Exists(encryptedJson))
+// {
+    decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptFile(encryptedJson, key);
+// }
+// else
+// {
+//     decryptedJson = BlowFishDecryption.JsonDecryptor.DecryptContent(encryptedJson, key); // You’ll need to implement this overload
+// }
+
 var decryptedStream = new MemoryStream(Encoding.UTF8.GetBytes(decryptedJson));
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false)
@@ -74,6 +85,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.Configure<SheetSettings>(builder.Configuration.GetSection("SheetSettings"));
 builder.Services.Configure<GoogleDriveSettings>(builder.Configuration.GetSection("GoogleDriveSettings"));
 builder.Services.Configure<DriveOAuthCred>(builder.Configuration.GetSection("DriveOAuthCred"));
+
 // Register your services
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<GoogleAuthorizationService>();
@@ -105,6 +117,7 @@ builder.Services.AddTransient<IGetRecentPaymentTransaction, GetRecentPaymentTran
 builder.Services.AddTransient<IGetDashboardSummaryService, GetDashboardSummaryService>();
 builder.Services.AddTransient<IsalesInvoiceList, salesInvoiceListService>();
 builder.Services.AddTransient<IresetFinancialYearInterface, resetFinancialYearService>();
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
@@ -117,9 +130,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-// CONFIG_KEY=your_secret_key ASPNETCORE_ENVIRONMENT=Development dotnet run
-// docker-compose up --build
-
-// ASPNETCORE_ENVIRONMENT=Development ENCRYPTED_JSON_CONFIG="Config/secure.Development.appsettings.json" CONFIG_KEY="your_secret_key" dotnet run
-
-// ASPNETCORE_ENVIRONMENT=Development ENCRYPTED_JSON_CONFIG="Config/secure.Development.appsettings.json" CONFIG_KEY=your_secret_key dotnet run
