@@ -9,6 +9,6 @@ services:
       - "8081:8080"
     environment:
       CONFIG_KEY: ${CONFIG_KEY}
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Development      
     volumes:
       - ./token_store:/app/token_store
